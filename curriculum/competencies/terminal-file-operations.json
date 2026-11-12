@@ -1,0 +1,13 @@
+{
+  "id": "terminal-file-operations",
+  "title": "Safe Terminal File Operations",
+  "summary": "Navigate a local workspace, preserve and organize files, diagnose path errors, and verify safe cleanup.",
+  "level": "foundations",
+  "assessmentRevision": 2,
+  "prerequisites": [],
+  "content": {
+    "path": "docs/modules/terminal-file-operations.md",
+    "objectivesAnchor": "learning-objectives",
+    "completionCriteriaAnchor": "completion-criteria"
+  }
+}
