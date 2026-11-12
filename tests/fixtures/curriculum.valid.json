@@ -1,0 +1,41 @@
+{
+  "manifest": {
+    "schemaVersion": 1,
+    "curriculumVersion": "0.1.0"
+  },
+  "competencies": [
+    {
+      "id": "fixture-root",
+      "title": "Synthetic root capability",
+      "summary": "A synthetic record for structural contract tests only.",
+      "level": "foundations",
+      "assessmentRevision": 1,
+      "prerequisites": [],
+      "content": {
+        "path": "docs/modules/fixture-root.md",
+        "objectivesAnchor": "learning-objectives",
+        "completionCriteriaAnchor": "completion-criteria"
+      }
+    },
+    {
+      "id": "fixture-dependent",
+      "title": "Synthetic dependent capability",
+      "summary": "A synthetic dependent record, not an educational module.",
+      "level": "junior",
+      "assessmentRevision": 1,
+      "prerequisites": ["fixture-root"],
+      "content": {
+        "path": "docs/modules/fixture-dependent.md",
+        "objectivesAnchor": "learning-objectives",
+        "completionCriteriaAnchor": "completion-criteria"
+      }
+    }
+  ],
+  "tracks": [
+    {
+      "id": "fixture-path",
+      "title": "Synthetic learning path",
+      "competencyIds": ["fixture-root", "fixture-dependent"]
+    }
+  ]
+}

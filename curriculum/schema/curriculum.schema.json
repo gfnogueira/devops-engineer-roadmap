@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:devops-engineer-roadmap:curriculum:1",
+  "title": "Curriculum structural contract v1",
+  "description": "Validates structure only; references, graph semantics and content existence require separate checks.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest", "competencies", "tracks"],
+  "properties": {
+    "manifest": { "$ref": "#/$defs/manifest" },
+    "competencies": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/competency" }
+    },
+    "tracks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/track" }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?![\\s\\S])"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "curriculumVersion"],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "curriculumVersion": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?![\\s\\S])"
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "objectivesAnchor", "completionCriteriaAnchor"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^docs/modules/(?:[a-z][a-z0-9]*(?:-[a-z0-9]+)*/)*[a-z][a-z0-9]*(?:-[a-z0-9]+)*\\.md(?![\\s\\S])"
+        },
+        "objectivesAnchor": { "$ref": "#/$defs/identifier" },
+        "completionCriteriaAnchor": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "competency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "summary", "level", "assessmentRevision", "prerequisites", "content"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "title": { "$ref": "#/$defs/text" },
+        "summary": { "$ref": "#/$defs/text" },
+        "level": {
+          "type": "string",
+          "enum": ["foundations", "junior", "mid-level", "senior", "specialist"]
+        },
+        "assessmentRevision": { "type": "integer", "minimum": 1 },
+        "prerequisites": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "content": { "$ref": "#/$defs/content" }
+      }
+    },
+    "track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "competencyIds"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "title": { "$ref": "#/$defs/text" },
+        "competencyIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/identifier" }
+        }
+      }
+    }
+  }
+}

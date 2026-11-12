@@ -1,0 +1,132 @@
+[
+  {
+    "name": "missing competency title",
+    "operation": "remove", "path": ["competencies", 0, "title"],
+    "expected": { "path": "/competencies/0/title", "keyword": "required" }
+  },
+  {
+    "name": "unsupported schema version",
+    "operation": "set", "path": ["manifest", "schemaVersion"], "value": 2,
+    "expected": { "path": "/manifest/schemaVersion", "keyword": "const" }
+  },
+  {
+    "name": "string version is not coerced to an integer",
+    "operation": "set", "path": ["manifest", "schemaVersion"], "value": "1",
+    "expected": { "path": "/manifest/schemaVersion", "keyword": "type" }
+  },
+  {
+    "name": "leading zero in curriculum version",
+    "operation": "set", "path": ["manifest", "curriculumVersion"], "value": "01.0.0",
+    "expected": { "path": "/manifest/curriculumVersion", "keyword": "pattern" }
+  },
+  {
+    "name": "invalid competency identifier",
+    "operation": "set", "path": ["competencies", 0, "id"], "value": "Fixture_Root",
+    "expected": { "path": "/competencies/0/id", "keyword": "pattern" }
+  },
+  {
+    "name": "identifier with trailing newline",
+    "operation": "set", "path": ["competencies", 0, "id"], "value": "fixture-root\n",
+    "expected": { "path": "/competencies/0/id", "keyword": "pattern" }
+  },
+  {
+    "name": "whitespace-only title",
+    "operation": "set", "path": ["competencies", 0, "title"], "value": " \t\n",
+    "expected": { "path": "/competencies/0/title", "keyword": "pattern" }
+  },
+  {
+    "name": "empty summary",
+    "operation": "set", "path": ["competencies", 0, "summary"], "value": "",
+    "expected": { "path": "/competencies/0/summary", "keyword": "minLength" }
+  },
+  {
+    "name": "unknown educational level",
+    "operation": "set", "path": ["competencies", 0, "level"], "value": "expert",
+    "expected": { "path": "/competencies/0/level", "keyword": "enum" }
+  },
+  {
+    "name": "zero assessment revision",
+    "operation": "set", "path": ["competencies", 0, "assessmentRevision"], "value": 0,
+    "expected": { "path": "/competencies/0/assessmentRevision", "keyword": "minimum" }
+  },
+  {
+    "name": "fractional assessment revision",
+    "operation": "set", "path": ["competencies", 0, "assessmentRevision"], "value": 1.5,
+    "expected": { "path": "/competencies/0/assessmentRevision", "keyword": "type" }
+  },
+  {
+    "name": "missing prerequisites are not defaulted",
+    "operation": "remove", "path": ["competencies", 0, "prerequisites"],
+    "expected": { "path": "/competencies/0/prerequisites", "keyword": "required" }
+  },
+  {
+    "name": "prerequisites must be an array",
+    "operation": "set", "path": ["competencies", 1, "prerequisites"], "value": "fixture-root",
+    "expected": { "path": "/competencies/1/prerequisites", "keyword": "type" }
+  },
+  {
+    "name": "invalid prerequisite identifier",
+    "operation": "set", "path": ["competencies", 1, "prerequisites", 0], "value": "invalid_id",
+    "expected": { "path": "/competencies/1/prerequisites/0", "keyword": "pattern" }
+  },
+  {
+    "name": "content path escapes modules directory",
+    "operation": "set", "path": ["competencies", 0, "content", "path"], "value": "docs/modules/../private.md",
+    "expected": { "path": "/competencies/0/content/path", "keyword": "pattern" }
+  },
+  {
+    "name": "absolute content path",
+    "operation": "set", "path": ["competencies", 0, "content", "path"], "value": "/docs/modules/fixture-root.md",
+    "expected": { "path": "/competencies/0/content/path", "keyword": "pattern" }
+  },
+  {
+    "name": "content path with trailing newline",
+    "operation": "set", "path": ["competencies", 0, "content", "path"], "value": "docs/modules/fixture-root.md\n",
+    "expected": { "path": "/competencies/0/content/path", "keyword": "pattern" }
+  },
+  {
+    "name": "anchor includes fragment delimiter",
+    "operation": "set", "path": ["competencies", 0, "content", "objectivesAnchor"], "value": "#learning-objectives",
+    "expected": { "path": "/competencies/0/content/objectivesAnchor", "keyword": "pattern" }
+  },
+  {
+    "name": "missing completion criteria anchor",
+    "operation": "remove", "path": ["competencies", 0, "content", "completionCriteriaAnchor"],
+    "expected": { "path": "/competencies/0/content/completionCriteriaAnchor", "keyword": "required" }
+  },
+  {
+    "name": "empty declared track",
+    "operation": "set", "path": ["tracks", 0, "competencyIds"], "value": [],
+    "expected": { "path": "/tracks/0/competencyIds", "keyword": "minItems" }
+  },
+  {
+    "name": "invalid track reference type",
+    "operation": "set", "path": ["tracks", 0, "competencyIds", 0], "value": 1,
+    "expected": { "path": "/tracks/0/competencyIds/0", "keyword": "type" }
+  },
+  {
+    "name": "unknown root property is not removed",
+    "operation": "set", "path": ["extra"], "value": true,
+    "expected": { "path": "/extra", "keyword": "additionalProperties" }
+  },
+  {
+    "name": "unknown manifest property",
+    "operation": "set", "path": ["manifest", "extra"], "value": true,
+    "expected": { "path": "/manifest/extra", "keyword": "additionalProperties" }
+  },
+  {
+    "name": "unknown competency property",
+    "operation": "set", "path": ["competencies", 0, "extra"], "value": true,
+    "expected": { "path": "/competencies/0/extra", "keyword": "additionalProperties" }
+  },
+  {
+    "name": "unknown content property",
+    "operation": "set", "path": ["competencies", 0, "content", "extra"], "value": true,
+    "expected": { "path": "/competencies/0/content/extra", "keyword": "additionalProperties" }
+  },
+  {
+    "name": "unknown track property",
+    "operation": "set", "path": ["tracks", 0, "extra"], "value": true,
+    "expected": { "path": "/tracks/0/extra", "keyword": "additionalProperties" }
+  }
+]
