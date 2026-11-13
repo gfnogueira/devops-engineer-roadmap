@@ -367,6 +367,6 @@ For remediation, explain the failed checkpoint and choose either [resume](#resum
 
 ## Next Steps
 
-The planned follow-on competencies are **local-access-and-secrets** and **git-change-management**. Both require this competency; their modules are not available yet. Access-control work will build on scoped files and permissions; Git work will build on preserving, inspecting, and recovering changes.
+[Local Access and Synthetic Secrets](local-access-and-secrets.md) is available and builds on scoped files and permissions; its laboratory execution is pending. **git-change-management** remains planned and will build on preserving, inspecting, and recovering changes. Both require this competency independently; the access module is not a prerequisite for the Git module.
 
 If paths still feel uncertain, draw the lab directory tree and predict reads from each child before running them. If safety checks feel mechanical, explain what each protects and what it leaves unprotected. For contributing improvements to this module, use the [curriculum authoring guide](../curriculum-authoring-guide.md).

@@ -44,7 +44,7 @@ The structural catalog has exactly three required top-level properties:
 
 An empty catalog is structurally valid. It is not a complete learning product. A declared track must contain at least one competency ID. The three-competency delivery requirement is a product acceptance criterion, not a schema restriction.
 
-The authoring layout uses a manifest, one JSON file per competency, and one JSON file per track under `curriculum/manifest.json`, `curriculum/competencies/`, and `curriculum/tracks/`. C03 introduces the first production [competency record](../curriculum/competencies/terminal-file-operations.json) and its [canonical module](modules/terminal-file-operations.md). Production manifest/track files and file aggregation remain future work. The [authoring guide](curriculum-authoring-guide.md) explains content conventions and a bounded structural check for this record; the existing test fixtures remain synthetic.
+The authoring layout uses a manifest, one JSON file per competency, and one JSON file per track under `curriculum/manifest.json`, `curriculum/competencies/`, and `curriculum/tracks/`. Production content currently includes [terminal file operations](modules/terminal-file-operations.md) and [local access and secrets](modules/local-access-and-secrets.md), with their respective [terminal metadata](../curriculum/competencies/terminal-file-operations.json) and [access metadata](../curriculum/competencies/local-access-and-secrets.json). Production manifest/track files and file aggregation remain future work. The [authoring guide](curriculum-authoring-guide.md) explains content conventions and checks for these records; the existing test fixtures remain synthetic. Both modules await practical laboratory execution.
 
 ### Manifest
 
