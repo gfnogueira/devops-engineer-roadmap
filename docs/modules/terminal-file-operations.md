@@ -367,6 +367,6 @@ For remediation, explain the failed checkpoint and choose either [resume](#resum
 
 ## Next Steps
 
-[Local Access and Synthetic Secrets](local-access-and-secrets.md) builds on scoped files and permissions. [Local Git Change Management](git-change-management.md) builds on preserving, inspecting, and recovering changes. Both are available with laboratory execution pending. Both require this competency independently; neither is a prerequisite for the other.
+[Local Access and Synthetic Secrets](local-access-and-secrets.md) builds on scoped files and permissions. [Local Git Change Management](git-change-management.md) builds on preserving, inspecting, and recovering changes. Both are available with laboratory execution pending. Both require this competency independently; neither is a prerequisite for the other. The [Foundations learning path](../learning-paths/foundations.md) shows all three modules and a suggested order.
 
 If paths still feel uncertain, draw the lab directory tree and predict reads from each child before running them. If safety checks feel mechanical, explain what each protects and what it leaves unprotected. For contributing improvements to this module, use the [curriculum authoring guide](../curriculum-authoring-guide.md).

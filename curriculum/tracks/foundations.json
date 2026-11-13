@@ -1,0 +1,9 @@
+{
+  "id": "foundations",
+  "title": "Foundations",
+  "competencyIds": [
+    "terminal-file-operations",
+    "local-access-and-secrets",
+    "git-change-management"
+  ]
+}

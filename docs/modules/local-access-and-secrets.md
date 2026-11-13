@@ -414,6 +414,6 @@ Review O1–O4 while artifacts exist, perform [challenge cleanup](#challenge-cle
 
 ## Next Steps
 
-If path diagnosis or cleanup is uncertain, revisit [Safe Terminal File Operations](terminal-file-operations.md). To improve this module, use the [curriculum authoring guide](../curriculum-authoring-guide.md).
+If path diagnosis or cleanup is uncertain, revisit [Safe Terminal File Operations](terminal-file-operations.md). The [Foundations learning path](../learning-paths/foundations.md) shows where this module sits among the current modules. To improve this module, use the [curriculum authoring guide](../curriculum-authoring-guide.md).
 
 [Local Git Change Management](git-change-management.md) is available, with laboratory execution pending. It shares `terminal-file-operations` as its required prerequisite; this module is not an additional required dependency. The Git module addresses staging and history, while this module establishes local access and disclosure decisions. Separate service identities, ACL administration, secret managers, and real incident handling require further learning and are outside this Foundations exercise.

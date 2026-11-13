@@ -895,8 +895,8 @@ Review O1–O4 and the boundary observations for O5 while both repositories exis
 
 ## Next Steps
 
-If locations, quoting, or exit statuses were uncertain, revisit [Safe Terminal File Operations](terminal-file-operations.md). For a fuller treatment of who can read a file and what belongs in shareable evidence, continue with [Local Access and Synthetic Secrets](local-access-and-secrets.md); it requires the same prerequisite as this module and neither module requires the other.
+If locations, quoting, or exit statuses were uncertain, revisit [Safe Terminal File Operations](terminal-file-operations.md). For a fuller treatment of who can read a file and what belongs in shareable evidence, continue with [Local Access and Synthetic Secrets](local-access-and-secrets.md); it requires the same prerequisite as this module and neither module requires the other. The [Foundations learning path](../learning-paths/foundations.md) shows all three current modules and a suggested order.
 
-Working with other people introduces topics that this module deliberately left out: remote repositories and authentication, cloning and exchanging commits, branches and merging, conflict resolution, and review workflows. Modules for these are **planned and not yet available**; no links exist yet. A Foundations learning path that connects the three current modules is also planned. Rewriting history, hooks, and commit signing are later, more specialized subjects.
+Working with other people introduces topics that this module deliberately left out: remote repositories and authentication, cloning and exchanging commits, branches and merging, conflict resolution, and review workflows. Modules for these are **planned and not yet available**; no links exist yet. Rewriting history, hooks, and commit signing are later, more specialized subjects.
 
 To improve this module, use the [curriculum authoring guide](../curriculum-authoring-guide.md).

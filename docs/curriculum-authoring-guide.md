@@ -18,7 +18,7 @@ The initial approved Foundations competencies are:
 | `local-access-and-secrets` | `terminal-file-operations` | [Module available](modules/local-access-and-secrets.md); laboratory execution pending |
 | `git-change-management` | `terminal-file-operations` | [Module available](modules/git-change-management.md); laboratory execution pending |
 
-This list records scope and prerequisite intent; it is not a second machine-readable track definition. Do not create placeholder links to unpublished modules or expand the curriculum while fixing an existing lesson.
+This list records scope and prerequisite intent; it is not a second machine-readable track definition. The [Foundations learning path](learning-paths/foundations.md) is the learner-facing entry point for these modules, and [the Foundations track record](../curriculum/tracks/foundations.json) holds the machine-readable membership. Do not create placeholder links to unpublished modules or expand the curriculum while fixing an existing lesson.
 
 ## Use a consistent module structure
 
@@ -105,20 +105,23 @@ The [curriculum contract](curriculum-contract.md) and [canonical JSON Schema](..
 | --- | --- |
 | `docs/modules/<id>.md` | Canonical lesson, objectives, exercises, assessment, and completion criteria |
 | `curriculum/competencies/<id>.json` | Discovery fields, stable identity, required prerequisites, assessment revision, and Markdown references |
-| `curriculum/manifest.json` | Catalog schema and curriculum versions when the production manifest is introduced |
-| `curriculum/tracks/<id>.json` | Track identity and membership when production tracks are introduced |
+| `curriculum/manifest.json` | Catalog schema version and curriculum version |
+| `curriculum/tracks/<id>.json` | Track identity, membership, and suggested learning order |
+| `docs/learning-paths/<id>.md` | Human-readable navigation for a track; links to modules without repeating their lessons |
 
-There are currently three production competency records, one for each approved Foundations competency. A production manifest, track, and automatic file aggregator have not yet been introduced, so no production catalog or learning path exists yet.
+There are currently three production competency records, one for each approved Foundations competency, a manifest at curriculum version `0.1.0`, and one track, `foundations`. Each record's `id` must equal its file name without `.json`, and the two record directories may contain nothing else. The catalog is [aggregated in memory](curriculum-contract.md#production-catalog-and-aggregation) from these files; do not create or commit a combined catalog file.
+
+A track's `competencyIds` order is the suggested learning order shown on its learning-path page. It never adds a requirement: only `prerequisites` do. The Foundations track must also contain every prerequisite of its members.
 
 A competency record must contain exactly `id`, `title`, `summary`, `level`, `assessmentRevision`, `prerequisites`, and `content`. Use lowercase kebab-case IDs and preserve them when titles change. The terminal competency is a root with an empty prerequisite array; dependent competencies list all required IDs, using AND semantics.
 
-`content` contains `path`, `objectivesAnchor`, and `completionCriteriaAnchor`. Paths stay under `docs/modules/` and end in `.md`. Anchor values omit `#`. Use the unique headings `## Learning Objectives` and `## Completion Criteria` with `learning-objectives` and `completion-criteria` as their respective references. Check that the file and headings exist; schema validation alone cannot establish that.
+`content` contains `path`, `objectivesAnchor`, and `completionCriteriaAnchor`. Paths stay under `docs/modules/` and end in `.md`. Anchor values omit `#`. Use the unique headings `## Learning Objectives` and `## Completion Criteria` with `learning-objectives` and `completion-criteria` as their respective references. Schema validation alone cannot establish that the file and headings exist; [content-reference validation](curriculum-contract.md#content-reference-validation) does.
 
 The summary is a short discovery description. Do not put the full objectives, assessment answers, rubrics, application layout, or learner progress in JSON. Track records own membership; competency records have no `tracks` field.
 
 Start an assessment revision at `1`. Increment it when learning objectives, mandatory evidence, or required prerequisites change; retain it for editorial-only corrections. Catalog `schemaVersion` is currently `1`. Curriculum releases use `MAJOR.MINOR.PATCH`: editorial fixes are patch changes, compatible additions minor changes, and incompatible changes major changes. A structural contract change needs an explicit schema-version review. These policies are not enforced by simply checking the number format.
 
-Review references and the whole prerequisite graph when changing dependencies. Structural validation rejects invalid shapes; semantic validation rejects duplicate IDs, missing targets, duplicate edges, self-dependencies, and cycles. Neither establishes educational quality, reads Markdown, or grants completion.
+Review references and the whole prerequisite graph when changing dependencies. Structural validation rejects invalid shapes; semantic validation rejects duplicate IDs, missing targets, duplicate edges, self-dependencies, and cycles. Content-reference validation rejects missing or unsafe content paths, unresolved or ambiguous anchors, broken internal links, and module files that no competency references. None of these establishes educational quality, checks external resources, or grants completion.
 
 ## Validate and submit a focused contribution
 
@@ -127,58 +130,29 @@ Use the repository's documented Node.js 24.x and npm 11.x environment. With depe
 ```sh
 npm test
 npm run typecheck
+npm run validate:curriculum
 ```
 
-For setup, see [the contract's check instructions](curriculum-contract.md#run-the-checks). The existing tests exercise validators using synthetic catalogs; passing them does not automatically validate a newly authored JSON file.
+For setup, see [the contract's check instructions](curriculum-contract.md#run-the-checks). `npm test` exercises the validators with synthetic inputs and also holds the acceptance expectations for the production curriculum. `npm run validate:curriculum` is the check for your actual files: it loads the manifest, every competency record, and every track, then runs structural, semantic, and content-reference validation and the Foundations prerequisite rule. It needs no network access and writes nothing.
 
-For the three current competencies, run this entire block from the repository root with the existing dependencies installed. It reads the actual JSON files and calls both existing validation APIs. The enclosing catalog exists **only in memory**; its manifest version is a validation placeholder, not a production release decision. The empty track array does not create a learning path.
+**Expected success:** the command prints the curriculum version, the competency and track membership, and the number of Markdown files and internal links checked, and exits with status `0`. On failure it names the stage that failed and prints one line per problem, with a stable code, the location, and a corrective message, and exits with status `1`. A Node experimental-feature warning about type stripping is distinct from a validation result: rely on the printed result and the exit status.
 
-The semantic validator imports `./validate-curriculum.js` from TypeScript source. Plain Node type stripping does not remap that filename. The process-local [Node module hook](https://nodejs.org/download/release/v24.2.0/docs/api/module.html#moduleregisterhooksoptions) below resolves only that specific import from that specific validator to the existing `.ts` file. It writes no helper or compiled files and changes no validator. The dynamic import runs after the hook is registered; all other imports use normal resolution.
+The command was executed successfully on **2026-11-13** with Node.js **24.2.0** and the existing installed dependencies, against the three current competencies. No laboratory commands are executed by this check.
 
-```sh
-node --input-type=module <<'NODE'
-import { readFileSync } from 'node:fs';
-import { registerHooks } from 'node:module';
-import { pathToFileURL } from 'node:url';
-import { validateCurriculum } from './scripts/validate-curriculum.ts';
+### Write links and headings the checks can resolve
 
-const semanticURL = pathToFileURL(
-  `${process.cwd()}/scripts/validate-curriculum-semantics.ts`,
-).href;
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    if (context.parentURL === semanticURL && specifier === './validate-curriculum.js') {
-      return nextResolve('./validate-curriculum.ts', context);
-    }
-    return nextResolve(specifier, context);
-  },
-});
-const { validateCurriculumSemantics } = await import(semanticURL);
+Automated validation covers internal references only. External URLs are counted but never fetched; verifying them remains the manual review described under [Verify and attribute resources](#verify-and-attribute-resources).
 
-const competencies = [
-  'terminal-file-operations',
-  'local-access-and-secrets',
-  'git-change-management',
-].map(
-  (id) => JSON.parse(readFileSync(`curriculum/competencies/${id}.json`, 'utf8')),
-);
-const catalog = {
-  manifest: { schemaVersion: 1, curriculumVersion: '0.0.0' },
-  competencies,
-  tracks: [],
-};
-const structural = validateCurriculum(catalog);
-const semantic = validateCurriculumSemantics(catalog);
-console.log(JSON.stringify({ structural, semantic }, null, 2));
-if (!structural.valid || !semantic.valid) process.exitCode = 1;
-NODE
-```
+- Link to other repository files with relative paths and forward slashes, matching letter case exactly: `[text](../modules/example.md#completion-criteria)`. Do not use absolute paths, symbolic links, or paths that leave the repository.
+- Write headings in the `## Heading` form. An anchor is the heading text in lowercase with punctuation removed and each space replaced by a hyphen, so `#### 1. Establish the boundary` is `#1-establish-the-boundary`. The [contract](curriculum-contract.md#heading-anchors) gives the exact rule and its limits. It is this project's minimal rule, not a guarantee about how any particular website renders anchors.
+- Give every heading that you link to, or name in metadata, text that is unique within its file. A link to a repeated heading is rejected as ambiguous; numeric suffixes such as `#cleanup-1` are not supported.
+- Keep each link on one line and use inline links. Reference-style links and links wrapped across lines are not checked.
+- Example links inside fenced code blocks or inline code are ignored, so they can show syntax without pointing at a real file. Close every fenced code block: an unclosed one is rejected, because the rest of the file could not be checked.
+- Use plain text, asterisk emphasis, or inline code in headings you link to. The contract lists the [known limitations](curriculum-contract.md#known-limitations-of-the-markdown-reader) of the checks, including forms that are not checked at all.
 
-**Expected success:** both `structural` and `semantic` contain `"valid": true` and `"errors": []`, and the command exits with status `0`. Validation failures print diagnostics and exit with status `1`; missing files, invalid JSON, or import failures also terminate unsuccessfully. A Node experimental-feature warning is distinct from validation failure: inspect the results and exit status rather than treating a warning as a pass or failure.
+### Add or change curriculum membership
 
-The exact block above was executed successfully on **2026-11-13** with Node.js **24.2.0** and the existing installed dependencies: both validations passed with exit status `0`. Node emitted its experimental type-stripping warning. No laboratory commands were executed by this check.
-
-All three records are necessary: the [semantic API](curriculum-contract.md#semantic-validation-api-and-diagnostics) checks the terminal prerequisite together with its two dependents, and also runs structural validation internally. The explicit structural call makes both results visible. This fixed three-record check is a contributor procedure, not file discovery, a production aggregator, or validation of Markdown and lab behavior. Passing synthetic unit tests alone still does not validate the real curriculum records.
+Adding a competency to the production curriculum is a deliberate scope decision, not a side effect of writing a lesson. When one is approved, add its module and record, add its ID to the track at the intended position, update the track's learning-path page and the links between neighboring modules, and update the approved membership in [the production acceptance tests](../tests/production-curriculum.test.ts). A Markdown file under `docs/modules/` without a competency record is rejected as orphaned; keep drafts elsewhere until they are ready.
 
 Before proposing a contribution, review:
 
