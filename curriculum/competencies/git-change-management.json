@@ -1,0 +1,13 @@
+{
+  "id": "git-change-management",
+  "title": "Local Git Change Management",
+  "summary": "Record, inspect, and recover changes in a disposable local Git repository, keep synthetic secrets out of new commits, and explain the limits of ignore rules.",
+  "level": "foundations",
+  "assessmentRevision": 1,
+  "prerequisites": ["terminal-file-operations"],
+  "content": {
+    "path": "docs/modules/git-change-management.md",
+    "objectivesAnchor": "learning-objectives",
+    "completionCriteriaAnchor": "completion-criteria"
+  }
+}
