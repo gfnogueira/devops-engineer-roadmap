@@ -2,10 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:devops-engineer-roadmap:localization:1",
   "title": "Curriculum localization overlay contract v1",
-  "description": "Validates the structure of one translation overlay. Locale, file location, ID existence, NFC normalization and source-hash freshness require separate checks against the curriculum.",
+  "description": "Validates the structure of one translation overlay (competency, track, or module). A module overlay carries only status and provenance; the translated Markdown lives in docs/locales/<locale>/modules/<id>.md and is associated with the canonical module through the competency ID. Locale, file location, ID existence, NFC normalization and source-hash freshness require separate checks against the curriculum.",
   "oneOf": [
     { "$ref": "#/$defs/competencyOverlay" },
-    { "$ref": "#/$defs/trackOverlay" }
+    { "$ref": "#/$defs/trackOverlay" },
+    { "$ref": "#/$defs/moduleOverlay" }
   ],
   "$defs": {
     "identifier": {
@@ -76,6 +77,20 @@
         "locale": { "$ref": "#/$defs/locale" },
         "id": { "$ref": "#/$defs/identifier" },
         "title": { "$ref": "#/$defs/text" },
+        "status": { "type": "string", "enum": ["draft", "reviewed"] },
+        "provenance": true
+      },
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/$defs/statusProvenance" }]
+    },
+    "moduleOverlay": {
+      "type": "object",
+      "required": ["localizationVersion", "kind", "locale", "id", "status", "provenance"],
+      "properties": {
+        "localizationVersion": { "type": "integer", "const": 1 },
+        "kind": { "const": "module" },
+        "locale": { "$ref": "#/$defs/locale" },
+        "id": { "$ref": "#/$defs/identifier" },
         "status": { "type": "string", "enum": ["draft", "reviewed"] },
         "provenance": true
       },

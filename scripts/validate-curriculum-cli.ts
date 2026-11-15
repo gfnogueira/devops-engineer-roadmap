@@ -81,7 +81,7 @@ async function main(): Promise<void> {
       for (const entry of coverage.locales) {
         const text = (label: string, c: typeof entry.competencies): string =>
           `${label} ${c.publishable} publishable, ${c.draft} draft, ${c.outdated} outdated, ${c.missing} missing`;
-        console.log(`- ${entry.locale}: ${text('competencies', entry.competencies)}; ${text('tracks', entry.tracks)}`);
+        console.log(`- ${entry.locale}: ${text('competencies', entry.competencies)}; ${text('tracks', entry.tracks)}; ${text('modules', entry.modules)}`);
       }
       // Warnings are diagnostics, not results: they go to standard error and do not change the status.
       for (const warning of warnings) console.error(`- [${warning.code}] ${warning.file}: ${warning.message}`);

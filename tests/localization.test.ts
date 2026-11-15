@@ -86,6 +86,7 @@ describe('overlay validation', () => {
       locale: 'pt-BR',
       competencies: { total: 2, publishable: 1, draft: 1, outdated: 0, missing: 0 },
       tracks: { total: 1, publishable: 1, draft: 0, outdated: 0, missing: 0 },
+      modules: { total: 0, publishable: 0, draft: 0, outdated: 0, missing: 0 },
     }]);
   });
 
@@ -225,7 +226,7 @@ describe('overlay loading', () => {
       'curriculum/locales/pt-BR/tracks/foundations.json': json(trackOverlay()),
       'curriculum/locales/pt-BR/competencies/c.json': '{ "secret": synthetic-private-value, }',
       'curriculum/locales/pt-BR/competencies/notes.txt': 'x',
-      'curriculum/locales/pt-BR/modules/a.json': '{}',
+      'curriculum/locales/pt-BR/glossary/a.json': '{}',
       'curriculum/locales/README.md': 'x',
     });
     const loaded = loadLocalizationOverlays(root);
@@ -238,7 +239,7 @@ describe('overlay loading', () => {
       'UNEXPECTED_ENTRY curriculum/locales/README.md',
       'INVALID_JSON curriculum/locales/pt-BR/competencies/c.json',
       'UNEXPECTED_ENTRY curriculum/locales/pt-BR/competencies/notes.txt',
-      'UNEXPECTED_ENTRY curriculum/locales/pt-BR/modules',
+      'UNEXPECTED_ENTRY curriculum/locales/pt-BR/glossary',
     ]);
     expect(JSON.stringify(loaded.errors)).not.toContain('synthetic-private-value');
   });

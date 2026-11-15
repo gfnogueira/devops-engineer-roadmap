@@ -15,7 +15,33 @@ export interface MarkdownLink {
   line: number;
 }
 
+export interface MarkdownHeading {
+  /** 1 to 6: the number of `#` characters. */
+  level: number;
+  /** Heading text exactly as written, without the closing `#` sequence. */
+  text: string;
+  /** Anchor derived with {@link headingAnchor}; empty when the heading has no anchorable text. */
+  anchor: string;
+  /** 1-based line number. */
+  line: number;
+}
+
+export interface MarkdownFence {
+  /** Text after the opening marker, trimmed. */
+  info: string;
+  /** Lines between the fences joined with `\n`, byte-for-byte otherwise. */
+  body: string;
+  /** 1-based line of the opening fence. */
+  line: number;
+}
+
 export interface MarkdownDocument {
+  /** Every ATX heading outside fenced code, in document order. */
+  headings: MarkdownHeading[];
+  /** Every fenced code block, in document order. An unclosed block runs to the end of the file. */
+  fences: MarkdownFence[];
+  /** Sorted distinct `http`, `https` and `mailto` destinations found outside fenced code. */
+  externalUrls: string[];
   /** Anchor to the 1-based lines of every heading that produces it, in document order. */
   anchors: Map<string, number[]>;
   links: MarkdownLink[];
@@ -28,7 +54,9 @@ export interface MarkdownDocument {
 
 // A backtick fence may not have a backtick in its info string; such a line is ordinary text.
 const FENCE = /^ {0,3}(`{3,}(?!.*`)|~{3,})/;
-const HEADING = /^ {0,3}#{1,6}(?:[ \t]+(.*))?$/;
+const HEADING = /^ {0,3}(#{1,6})(?:[ \t]+(.*))?$/;
+const BARE_URL = /https?:\/\/[^\s<>"'`\[\]()]+/gi;
+const EXTERNAL_TARGET = /^(?:https?|mailto):/i;
 const INLINE_CODE = /(?<!`)(`+)(?!`).*?(?<!`)\1(?!`)/g;
 const INLINE_LINK =
   /\[(?:[^\[\]]|\[[^\[\]]*\])*\]\(\s*(<[^<>]*>|[^\s()]*(?:\([^\s()]*\)[^\s()]*)*)(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
@@ -50,8 +78,13 @@ export function headingAnchor(text: string): string {
 export function parseMarkdown(source: string): MarkdownDocument {
   const anchors = new Map<string, number[]>();
   const links: MarkdownLink[] = [];
+  const headings: MarkdownHeading[] = [];
+  const fences: MarkdownFence[] = [];
+  const urls = new Set<string>();
   let fence: string | undefined;
   let fenceLine: number | undefined;
+  let fenceInfo = '';
+  let fenceBody: string[] = [];
 
   source.split(/\r?\n/).forEach((text, index) => {
     const line = index + 1;
@@ -61,18 +94,27 @@ export function parseMarkdown(source: string): MarkdownDocument {
       const closes = marker !== undefined && marker[0] === fence[0]
         && marker.length >= fence.length
         && text.trim() === marker;
-      if (closes) fence = undefined;
+      if (closes) {
+        fences.push({ info: fenceInfo, body: fenceBody.join('\n'), line: fenceLine! });
+        fence = undefined;
+      } else {
+        fenceBody.push(text);
+      }
       return;
     }
     if (marker !== undefined) {
       fence = marker;
       fenceLine = line;
+      fenceInfo = text.trim().slice(marker.length).trim();
+      fenceBody = [];
       return;
     }
 
     const heading = HEADING.exec(text);
     if (heading !== null) {
-      const anchor = headingAnchor((heading[1] ?? '').replace(/(?:^|[ \t]+)#+[ \t]*$/, ''));
+      const headingText = (heading[2] ?? '').replace(/(?:^|[ \t]+)#+[ \t]*$/, '');
+      const anchor = headingAnchor(headingText);
+      headings.push({ level: heading[1]!.length, text: headingText, anchor, line });
       if (anchor !== '') anchors.set(anchor, [...(anchors.get(anchor) ?? []), line]);
     }
 
@@ -80,8 +122,16 @@ export function parseMarkdown(source: string): MarkdownDocument {
     const prose = text.replace(INLINE_CODE, (span) => ' '.repeat(span.length));
     for (const match of prose.matchAll(INLINE_LINK)) {
       const raw = match[1] ?? '';
-      links.push({ target: raw.startsWith('<') ? raw.slice(1, -1) : raw, line });
+      const target = raw.startsWith('<') ? raw.slice(1, -1) : raw;
+      links.push({ target, line });
+      if (EXTERNAL_TARGET.test(target)) urls.add(target);
     }
+    // Bare URLs are read from the whole line, code spans included, so an edited example is noticed.
+    for (const match of text.matchAll(BARE_URL)) urls.add(match[0].replace(/[.,;:!?*_]+$/, ''));
   });
-  return { anchors, links, unclosedFence: fence === undefined ? undefined : fenceLine };
+  if (fence !== undefined) fences.push({ info: fenceInfo, body: fenceBody.join('\n'), line: fenceLine! });
+  return {
+    headings, fences, externalUrls: [...urls].sort(), anchors, links,
+    unclosedFence: fence === undefined ? undefined : fenceLine,
+  };
 }

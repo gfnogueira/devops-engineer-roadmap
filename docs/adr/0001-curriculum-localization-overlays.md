@@ -1,6 +1,6 @@
 # ADR 0001: Curriculum localization overlays
 
-Status: **Architectural direction approved; MVP 0.4-B infrastructure implemented.** The schema, loader, validator, hash and synthetic tests exist (see [Implementation status](#implementation-status)). **No real translation exists**, no human translation review has occurred, and consumer integration, module translation and Markdown rendering remain **not authorized**.
+Status: **Architectural direction approved; MVP 0.4-B infrastructure implemented; module overlay contract added by [Amendment 1](#amendment-1-module-overlays).** The schema, loader, validator, hash and synthetic tests exist (see [Implementation status](#implementation-status)). Reviewed `pt-BR` overlays exist for the three Foundations competencies and the Foundations track (see the curriculum contract). *This record originally stated that no real translation existed; that was true at MVP 0.4-B and has since changed.* **No translated module exists**, and consumer integration, creating real translated modules and Markdown rendering remain **not authorized**.
 
 Numbering is local to this repository. Workspace-level records (for example the curriculum-contract ADR-0002 in the architecture register) are numbered independently.
 
@@ -28,7 +28,23 @@ MVP 0.4-B was authorized and implemented. Where this record's *Proposed detail* 
 | Overlay version | Unspecified | `localizationVersion: 1` in every overlay |
 | Draft in release mode | Allowed, shown as English | Allowed (no failure), reported as `DRAFT_NOT_PUBLISHABLE` |
 
-Not implemented and still unauthorized: real `pt-BR` overlays, snapshot export, consumer import and display, translated module bodies, module digests, Markdown rendering and anchor policy, and any decision on `curriculumVersion` for overlays.
+Not implemented and still unauthorized (as of MVP 0.4-B; see [Amendment 1](#amendment-1-module-overlays) for the later change to module support): snapshot export, consumer import and display, translated module bodies, module digests, Markdown rendering and anchor policy, and any decision on `curriculumVersion` for overlays. Reviewed `pt-BR` competency and track overlays were added after MVP 0.4-B and are no longer absent.
+
+## Amendment 1: module overlays
+
+Added after the original decision. The original text below is kept unchanged except for the status line and the implementation-status note above; where it says module translation is future work, this amendment describes the later, additive design. The [curriculum contract](../curriculum-contract.md#localization-overlay-contract) is authoritative for exact fields and rules.
+
+**Decision (additive, within `localizationVersion` 1):**
+
+1. A new overlay `kind` named `module` is added to `localization.schema.json`. Existing `competency` and `track` overlays are unchanged and remain valid; the schema `$id`, `schemaVersion` and `curriculumVersion` are unchanged.
+2. A module overlay stores only status and provenance, at `curriculum/locales/<locale>/modules/<competency-id>.json`. The translated Markdown is stored at `docs/locales/<locale>/modules/<competency-id>.md`. English `docs/modules/*.md` paths and contents are untouched.
+3. The translation is associated with the canonical module through the competency ID. Overlays do not store canonical paths; the path is read from the competency's `content.path`.
+4. `provenance.sourceHash` is SHA-256 over the NFC-normalized UTF-8 text of the whole canonical English Markdown file. This resolves, for modules, the "module digests" item that was deferred, and it keeps the existing convention: freshness is derived, `outdated` is never stored, and a `reviewed` module that is stale is a warning in development and an error with `--strict-translations`.
+5. Module review is independent of competency title/summary review. A machine-generated translation stays `draft` until a genuine human review is recorded.
+6. For a current translation the validator requires exactly one H1, identical ordered heading levels, identical ordered fenced code blocks, the same set of external URLs, valid in-page anchors, and an unambiguous positional mapping of the learning-objectives and completion-criteria headings. Anchors still come from the existing line-based reader; no renderer-specific algorithm is introduced, which means renderer parity remains an open requirement for any future rendering.
+7. Fenced code, including comments, stays untranslated. This is a **provisional technical safety constraint** that avoids language-specific parsing of executable code, not a permanent editorial rule; relaxing it needs a future amendment.
+
+**Not changed by this amendment:** real translated modules are not created, the two modules with pending reconciliation work are not translated, no consumer behavior or Skill Tree decision is altered, and the Skill Tree repository and its ADRs are unaffected. Producer/consumer impact: a consumer that understands only competency and track overlays is unaffected until module overlays are published in a snapshot; it must then be updated before it reads them.
 
 ## Context
 
@@ -103,7 +119,7 @@ curriculum/localization/pt-BR/competencies/<competency-id>.json
 curriculum/localization/pt-BR/tracks/<track-id>.json
 ```
 
-Per-entity files keep review diffs small and avoid merge conflicts between translators; a single file per locale is the alternative. Translated module bodies are future scope and, if added, must live under a locale-specific path, never replace `docs/modules/<name>.md`.
+Per-entity files keep review diffs small and avoid merge conflicts between translators; a single file per locale is the alternative. Translated module bodies were future scope when this was written; Amendment 1 stores them under `docs/locales/<locale>/modules/<id>.md`, never replacing `docs/modules/<name>.md`.
 
 ## Translation provenance
 
@@ -173,7 +189,7 @@ Producer-side, deterministic and with stable error codes, following the existing
 
 - Review capacity: reviewed translations require a fluent reviewer; stale overlays will fall back to English often.
 - Hash sensitivity: any English whitespace or punctuation change marks translations stale; this is intentional but adds churn.
-- Hash covers only title and summary; changes to module bodies or objectives are not detected by it (module digests are deferred).
+- Competency and track hashes cover only title and summary; changes to module bodies or objectives are not detected by them. (Amendment 1 adds a separate whole-document hash for module overlays.)
 - The anchor algorithm and rendering policy are undecided; translated headings may produce unstable anchors.
 - Mixed-language UI is possible during partial coverage; the consumer must communicate fallbacks.
 - Overlay storage layout and granularity are proposed, not decided.

@@ -10,6 +10,11 @@ import { createHash } from 'node:crypto';
  *   competency: sha256( UTF-8( JSON.stringify({ title: NFC(title), summary: NFC(summary) }) ) )
  *   track:      sha256( UTF-8( JSON.stringify({ title: NFC(title) }) ) )
  *
+ *   module:     sha256( UTF-8( NFC(canonical English Markdown file text) ) )
+ *
+ * The module hash covers the whole canonical English Markdown document, so any edit to it makes
+ * a module translation stale. No line-ending, trailing-whitespace or BOM normalization is applied.
+ *
  * The property order is fixed as written. The value is rendered as `sha256:` followed by 64
  * lowercase hexadecimal digits. No trimming, case folding or whitespace collapsing is applied.
  * Changing this algorithm is a localization contract change.
@@ -28,6 +33,15 @@ export function competencyCanonicalSource(title: string, summary: string): strin
 /** The exact string hashed for a track. A track has only one translatable field, `title`. */
 export function trackCanonicalSource(title: string): string {
   return JSON.stringify({ title: title.normalize('NFC') });
+}
+
+/** The exact string hashed for a module: the canonical English Markdown in NFC form. */
+export function moduleCanonicalSource(markdown: string): string {
+  return markdown.normalize('NFC');
+}
+
+export function moduleSourceHash(markdown: string): string {
+  return digest(moduleCanonicalSource(markdown));
 }
 
 export function competencySourceHash(title: string, summary: string): string {

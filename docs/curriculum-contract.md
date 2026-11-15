@@ -4,7 +4,7 @@ The Roadmap owns the canonical curriculum. C01 validates JSON structure; C02 add
 
 ## Localization overlays
 
-The structural contract below is English-only and stays at `schemaVersion` 1; `curriculum.schema.json` and the canonical records are unchanged. Translations are separate overlays with their own schema and version, described in [ADR 0001](adr/0001-curriculum-localization-overlays.md) and under [Localization overlay contract](#localization-overlay-contract). The infrastructure (schema, loader, validator, hash and tests) is implemented; the first reviewed `pt-BR` overlays (three competencies and the Foundations track) are included.
+The structural contract below is English-only and stays at `schemaVersion` 1; `curriculum.schema.json` and the canonical records are unchanged. Translations are separate overlays with their own schema and version, described in [ADR 0001](adr/0001-curriculum-localization-overlays.md) and under [Localization overlay contract](#localization-overlay-contract). The infrastructure (schema, loader, validator, hash and tests) is implemented; the first reviewed `pt-BR` overlays (three competencies and the Foundations track) are included. Module overlays (complete translated Markdown modules) are supported by the contract as an additive extension of `localizationVersion` 1; no translated module exists yet.
 
 ## Run the checks
 
@@ -373,6 +373,8 @@ Implemented in MVP 0.4-B. The overlay contract is versioned independently (`loca
 curriculum/schema/localization.schema.json
 curriculum/locales/<locale>/competencies/<competency-id>.json
 curriculum/locales/<locale>/tracks/<track-id>.json
+curriculum/locales/<locale>/modules/<competency-id>.json
+docs/locales/<locale>/modules/<competency-id>.md
 ```
 
 The only supported locale directory is `pt-BR`. One file holds one overlay, and the file name must equal the overlay `id`. [The schema](../curriculum/schema/localization.schema.json) rejects unknown properties at every object boundary, so an overlay can never carry `prerequisites`, `level`, `assessmentRevision`, `content`, `competencyIds`, progress or any other graph or assessment field.
@@ -396,6 +398,25 @@ Competency overlay (track overlays are identical except `kind` is `track` and th
 }
 ```
 
+Module overlay (added to `localizationVersion` 1 without changing the existing kinds):
+
+```json
+{
+  "localizationVersion": 1,
+  "kind": "module",
+  "locale": "pt-BR",
+  "id": "<competency-id>",
+  "status": "draft",
+  "provenance": {
+    "sourceHash": "sha256:<64 lowercase hex digits>",
+    "method": "machine-assisted",
+    "translatedBy": "<role or account identifier>"
+  }
+}
+```
+
+A module overlay carries no title, summary or path: the translated Markdown file `docs/locales/<locale>/modules/<competency-id>.md` holds all text, and its H1 is the translated title. The translated module is associated with the canonical English module through the **competency ID** (the file name and `id` of both files), never through a stored path; the canonical path is always read from the competency's `content.path`. Module review status and provenance are independent of the competency overlay: a translated title and summary can be `reviewed` while the module is still `draft`, and the reverse. Status and provenance rules are the ones in the table below. A machine-generated translation stays `draft` until a genuine human review is recorded; never invent a reviewer or review date.
+
 | Field | Rule |
 | --- | --- |
 | `status` | `draft` or `reviewed`. `outdated` is never stored; it is derived from the hash. |
@@ -414,7 +435,15 @@ track:      "sha256:" + hex( SHA-256( UTF-8( JSON.stringify({ title: NFC(title) 
 
 The property order is fixed exactly as written. `NFC` is `String.prototype.normalize('NFC')`. There is no trimming, case folding or whitespace collapsing, so any wording change is detected. A track has a single translatable canonical field (`title`); its `id` is the overlay key and its `competencyIds` are graph membership, so neither is hashed and reordering or editing a track's members does not stale a title translation. Changing this algorithm is a contract change.
 
-Test vectors (from [the tests](../tests/localization.test.ts)):
+The **module** hash is different in kind: it is computed over the whole canonical English Markdown file.
+
+```text
+module: "sha256:" + hex( SHA-256( UTF-8( NFC(canonical English Markdown text) ) ) )
+```
+
+Nothing else is normalized: line endings, trailing whitespace and a byte-order mark are significant, so any edit to the English module (including prose, objectives, links and code) makes its translation stale. A `reviewed` module translation therefore must be re-reviewed after every English edit. The canonical path is `content.path` of the competency with the same ID. The function is `moduleSourceHash` in [the hash module](../scripts/localization-hash.ts).
+
+Test vectors (from [the tests](../tests/localization.test.ts) and [the module tests](../tests/localization-modules.test.ts); module tests use synthetic Markdown only, never a production module hash):
 
 | Input | Hash |
 | --- | --- |
@@ -422,6 +451,7 @@ Test vectors (from [the tests](../tests/localization.test.ts)):
 | competency `Café` / `Maçã — é` (precomposed or decomposed input) | `sha256:fd648b69a8d720711d791384631d522caf9f93d3c1efc18bb796a61702837a79` |
 | track `Synthetic track` | `sha256:32c795e9af69c09b5e0167dbf6b1c376770b4c1a542a85f32cd77745f88571c1` |
 | track `Foundations` | `sha256:dbba71772c7a701403a4fa8acce084cec8cf3c707e7377485e50730a76100d00` |
+| module text `a` (the one-character string; the hash is of the text, not of a file) | `sha256:ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb` |
 
 ### Validation and modes
 
@@ -429,14 +459,22 @@ Test vectors (from [the tests](../tests/localization.test.ts)):
 
 | Code | When |
 | --- | --- |
-| `UNEXPECTED_ENTRY` | A stray file or directory, or a symbolic link, where only locale directories, `competencies/`, `tracks/` or `<id>.json` files are allowed. Nothing is read through it. |
-| `UNSUPPORTED_LOCALE` | A directory under `curriculum/locales/` that is not a supported locale. |
+| `UNEXPECTED_ENTRY` | A stray file or directory, or a symbolic link, where only locale directories, `competencies/`, `modules/`, `tracks/`, `<id>.json` files (or, under `docs/locales/<locale>/`, `modules/<id>.md` files) are allowed. Nothing is read through it. |
+| `UNSUPPORTED_LOCALE` | A directory under `curriculum/locales/` or `docs/locales/` that is not a supported locale. |
 | `INVALID_JSON` | A file that does not parse; the parser message is not echoed. |
 | `UNSUPPORTED_LOCALIZATION_VERSION` | `localizationVersion` is present and not `1`; the file is not interpreted further. |
 | `SCHEMA_VIOLATION` | Any structural error, including forbidden fields. |
 | `LOCALE_MISMATCH`, `KIND_MISMATCH`, `FILE_ID_MISMATCH` | The overlay disagrees with its directory or file name. |
-| `UNKNOWN_ID` | The competency or track does not exist. Overlays cannot create entities. |
-| `NOT_NFC` | Any string value is not NFC normalized. |
+| `UNKNOWN_ID` | The competency, track or module does not exist. Overlays cannot create entities. |
+| `NOT_NFC` | Any string value, or any translated Markdown file, is not NFC normalized. |
+| `INVALID_MARKDOWN_ENCODING` | A translated Markdown file is not valid UTF-8. |
+| `MISSING_TRANSLATED_MARKDOWN` | A module overlay without its `docs/locales/<locale>/modules/<id>.md`. |
+| `ORPHANED_TRANSLATED_MARKDOWN` | A translated Markdown file without a module overlay. |
+| `HEADING_STRUCTURE_MISMATCH` | The translation does not have exactly one H1, or its ordered heading levels differ from the English module. |
+| `FENCED_CODE_MISMATCH` | The ordered fenced code blocks (info string and exact content) differ, or a fence is not closed. |
+| `EXTERNAL_URL_MISMATCH` | The set of external `http`, `https` and `mailto` URLs differs. |
+| `INVALID_INTERNAL_ANCHOR` | An in-page `#anchor` link of the translation matches no heading or more than one. |
+| `HEADING_MAPPING_INVALID` | The learning-objectives or completion-criteria heading cannot be mapped by position. |
 | `DUPLICATE_OVERLAY` | Two overlays for the same locale, kind and ID. |
 | `STALE_TRANSLATION` (warning) | `sourceHash` differs from the current English hash. |
 | `OUTDATED_REVIEWED_TRANSLATION` (error, strict only) | A `reviewed` overlay whose hash is stale. |
@@ -452,14 +490,28 @@ A translation is **publishable** only when it is `reviewed` and its hash matches
 | `draft`, current hash | accepted | accepted, reported as not publishable |
 | Missing translation | accepted | accepted |
 
+### Module structure checks
+
+Structural parity is checked for every module overlay whose hash is **current**, whatever its status. A stale translation is reported only as `STALE_TRANSLATION` (or `OUTDATED_REVIEWED_TRANSLATION` in strict mode) because parity against changed English text would be meaningless. Missing and orphaned Markdown files, unsupported locales and non-NFC text are reported regardless. The checks use the same line-based reader as the content stage ([markdown-references](../scripts/markdown-references.ts)); no renderer-specific anchor algorithm is introduced.
+
+- **Headings:** exactly one H1, and the same ordered sequence of heading levels as the English module. Headings inside fenced code are ignored.
+- **Fenced code:** the same ordered blocks, with identical info string and byte-identical content. Fenced code, including comments, is **not translated in this initial contract**. This is a provisional technical safety constraint, not a permanent editorial rule; the validator does not parse executable code in any language.
+- **External URLs:** the same set of `http`, `https` and `mailto` destinations (link targets and bare URLs outside fences).
+- **Internal links:** `#anchor` links must match exactly one heading of the translation. Relative file links and cross-file anchors in `docs/locales/**` are checked by the existing content stage, which scans every Markdown file under `docs/`. Because translated files sit deeper than their English counterparts, relative links to other documents need extra `../` segments.
+- **Positional heading mapping:** translated headings have different anchors, so the competency's `objectivesAnchor` and `completionCriteriaAnchor` are mapped by position. Each anchor must identify exactly one English heading, the translated heading at the same position in the ordered heading list is its counterpart, and that counterpart must produce a non-empty anchor that is unique within the translation. The two mapped headings must differ. (`compareModuleStructure` returns the resulting mapping for a future consumer.)
+
+This mapping is a **structural contract**: it states which translated heading corresponds to which English heading, using the validator's own anchor reader. It is **not** a guarantee of the heading IDs that Astro or any other renderer will generate. Slug rules for translated headings (accents, repeated headings, punctuation) can differ between renderers, so a future rendering integration must verify or generate its own anchors and must not assume the anchors returned here.
+
+### Commands
+
 ```sh
 npm run validate:curriculum
 npm run validate:curriculum -- --strict-translations
 ```
 
-Warnings go to standard error and do not change the exit status; errors fail the command at the `localization` stage with status `1`. When `curriculum/locales/` exists, the success output adds a coverage line per locale (publishable, draft, outdated and missing counts). An unknown option is rejected. Without `curriculum/locales/` the command and its result are identical to before.
+Warnings go to standard error and do not change the exit status; errors fail the command at the `localization` stage with status `1`. When `curriculum/locales/` or `docs/locales/` exists, the success output adds a coverage line per locale (publishable, draft, outdated and missing counts for competencies, tracks and modules). An unknown option is rejected. Without either directory the command and its result are identical to before. Module coverage counts every competency module as translatable, so `missing` equals the number of modules without an overlay.
 
-Not implemented: translated module bodies and module digests, Markdown rendering, translated anchors, snapshot export of overlays, `curriculumVersion` policy for overlays, and any consumer behavior. The hash covers title and summary only, so objective or module changes do not make a translation stale.
+Not implemented: real translated modules, Markdown rendering, a renderer-compatible translated anchor policy, snapshot export of overlays, `curriculumVersion` policy for overlays, translation of code comments, and any consumer behavior. Competency and track hashes cover title and summary only, so a module edit does not make a competency overlay stale; module overlays have their own hash over the whole English Markdown.
 
 ## Tool references
 

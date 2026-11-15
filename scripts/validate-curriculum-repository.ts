@@ -5,7 +5,7 @@ import {
   validateContentReferences, type ContentCatalog, type ContentIssue, type ContentSummary,
 } from './validate-content-references.js';
 import {
-  validateLocalization, type LocalizationIssue, type LocalizationOptions, type LocalizationSummary,
+  validateLocalization, type LocalizationCatalog, type LocalizationIssue, type LocalizationOptions, type LocalizationSummary,
 } from './validate-localization.js';
 
 /**
@@ -123,7 +123,7 @@ export function validateCurriculumRepository(
     return { valid: false, stage: 'content', errors, sources };
   }
   const translations = validateLocalization(rootDir, {
-    competencies: catalog.competencies as unknown as { id: string; title: string; summary: string }[],
+    competencies: catalog.competencies as unknown as LocalizationCatalog['competencies'],
     tracks: catalog.tracks as unknown as { id: string; title: string }[],
   }, localization);
   if (translations.errors.length > 0) {
