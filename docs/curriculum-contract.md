@@ -2,6 +2,10 @@
 
 The Roadmap owns the canonical curriculum. C01 validates JSON structure; C02 adds identifier, reference, and prerequisite-graph validation for the complete catalog. C06 adds the production manifest and Foundations track, an in-memory catalog loader, content-reference validation for Markdown paths, anchors, and internal links, and one command that applies all of these to the real curriculum. Nothing here synchronizes repositories, renders content, fetches external URLs, or evaluates learner progress. The C01 and C02 APIs and the schema remain unchanged.
 
+## Localization overlays
+
+The structural contract below is English-only and stays at `schemaVersion` 1; `curriculum.schema.json` and the canonical records are unchanged. Translations are separate overlays with their own schema and version, described in [ADR 0001](adr/0001-curriculum-localization-overlays.md) and under [Localization overlay contract](#localization-overlay-contract). The infrastructure (schema, loader, validator, hash and tests) is implemented; the first reviewed `pt-BR` overlays (three competencies and the Foundations track) are included.
+
 ## Run the checks
 
 Use Node.js 24.x and npm 11.x. The recorded package manager is npm 11.3.0. From this repository:
@@ -358,6 +362,104 @@ Some requirements describe this curriculum's current scope, not every valid cata
 Synthetic tests create disposable repositories in the system temporary directory and remove them afterwards; they use no production lesson and no network. They cover [loading](../tests/load-curriculum.test.ts), [Markdown anchors and links](../tests/markdown-references.test.ts) including punctuation, whitespace, case, repeated and numeric headings, and fenced code, [content references](../tests/content-references.test.ts) including unsafe paths and symbolic links, and [stage ordering and prerequisite closure](../tests/curriculum-repository.test.ts). Regression tests cover a symbolic link in place of `curriculum/`, unclosed fenced code blocks, and backtick lines that are not valid opening fences. Start-up tests install a copy of the scripts in a disposable repository and confirm that a missing or symbolic-link `curriculum/`, including one that leads to an invalid schema, and a missing, linked, or invalid schema file each produce one coded diagnostic, a nonzero status, and no stack trace. [Command tests](../tests/curriculum-cli.test.ts) run the entry point as a child process against invalid synthetic repositories and check, for each stage, a status of `1`, the stable codes and source files on standard error, and the absence of any success output. The production acceptance tests read the real curriculum and also run the command as a child process.
 
 No new dependency is required for C06. Passing these checks does not establish educational quality, the availability or accuracy of external resources, or that any laboratory has been executed.
+
+## Localization overlay contract
+
+Implemented in MVP 0.4-B. The overlay contract is versioned independently (`localizationVersion`, currently `1`) from `schemaVersion` and `curriculumVersion`. Nothing here changes how the English curriculum is validated; the localization stage runs only after every canonical stage has passed, and only when `curriculum/locales/` exists.
+
+### Layout and schema
+
+```text
+curriculum/schema/localization.schema.json
+curriculum/locales/<locale>/competencies/<competency-id>.json
+curriculum/locales/<locale>/tracks/<track-id>.json
+```
+
+The only supported locale directory is `pt-BR`. One file holds one overlay, and the file name must equal the overlay `id`. [The schema](../curriculum/schema/localization.schema.json) rejects unknown properties at every object boundary, so an overlay can never carry `prerequisites`, `level`, `assessmentRevision`, `content`, `competencyIds`, progress or any other graph or assessment field.
+
+Competency overlay (track overlays are identical except `kind` is `track` and there is no `summary`):
+
+```json
+{
+  "localizationVersion": 1,
+  "kind": "competency",
+  "locale": "pt-BR",
+  "id": "<competency-id>",
+  "title": "…",
+  "summary": "…",
+  "status": "draft",
+  "provenance": {
+    "sourceHash": "sha256:<64 lowercase hex digits>",
+    "method": "human",
+    "translatedBy": "<role or account identifier>"
+  }
+}
+```
+
+| Field | Rule |
+| --- | --- |
+| `status` | `draft` or `reviewed`. `outdated` is never stored; it is derived from the hash. |
+| `provenance.method` | `human` or `machine-assisted`. |
+| `provenance.reviewedBy`, `reviewedAt` | Required when `status` is `reviewed` (date as `YYYY-MM-DD`) and forbidden when `draft`. The validator checks that they are present, not that a review really happened; values must come from a real review and must never be back-filled. |
+| `provenance.reviewedBy` convention | Use a stable, verifiable reviewer identifier, such as the reviewer's GitHub handle (for example `gfnogueira`), without a leading `@`. Do not use display names, e-mail addresses or other personal data. Do not invent historical reviews: record only reviews that actually took place, on the date they took place. |
+
+### Source hash
+
+The hash records the English metadata a translation was made from. It is computed over metadata fields, never over file bytes, so reformatting a JSON record does not make a translation stale. Both functions live in [the hash module](../scripts/localization-hash.ts).
+
+```text
+competency: "sha256:" + hex( SHA-256( UTF-8( JSON.stringify({ title: NFC(title), summary: NFC(summary) }) ) ) )
+track:      "sha256:" + hex( SHA-256( UTF-8( JSON.stringify({ title: NFC(title) }) ) ) )
+```
+
+The property order is fixed exactly as written. `NFC` is `String.prototype.normalize('NFC')`. There is no trimming, case folding or whitespace collapsing, so any wording change is detected. A track has a single translatable canonical field (`title`); its `id` is the overlay key and its `competencyIds` are graph membership, so neither is hashed and reordering or editing a track's members does not stale a title translation. Changing this algorithm is a contract change.
+
+Test vectors (from [the tests](../tests/localization.test.ts)):
+
+| Input | Hash |
+| --- | --- |
+| competency `Synthetic capability` / `Synthetic test record.` | `sha256:2153f5132c27fba5b095aa4454a8fef909f72e856435ee942ddfeab488c65c7c` |
+| competency `Café` / `Maçã — é` (precomposed or decomposed input) | `sha256:fd648b69a8d720711d791384631d522caf9f93d3c1efc18bb796a61702837a79` |
+| track `Synthetic track` | `sha256:32c795e9af69c09b5e0167dbf6b1c376770b4c1a542a85f32cd77745f88571c1` |
+| track `Foundations` | `sha256:dbba71772c7a701403a4fa8acce084cec8cf3c707e7377485e50730a76100d00` |
+
+### Validation and modes
+
+`validateLocalization` in [the localization validator](../scripts/validate-localization.ts) loads and checks overlays; `validateCurriculumRepository` runs it as the `localization` stage after `content`. Issues have stable codes.
+
+| Code | When |
+| --- | --- |
+| `UNEXPECTED_ENTRY` | A stray file or directory, or a symbolic link, where only locale directories, `competencies/`, `tracks/` or `<id>.json` files are allowed. Nothing is read through it. |
+| `UNSUPPORTED_LOCALE` | A directory under `curriculum/locales/` that is not a supported locale. |
+| `INVALID_JSON` | A file that does not parse; the parser message is not echoed. |
+| `UNSUPPORTED_LOCALIZATION_VERSION` | `localizationVersion` is present and not `1`; the file is not interpreted further. |
+| `SCHEMA_VIOLATION` | Any structural error, including forbidden fields. |
+| `LOCALE_MISMATCH`, `KIND_MISMATCH`, `FILE_ID_MISMATCH` | The overlay disagrees with its directory or file name. |
+| `UNKNOWN_ID` | The competency or track does not exist. Overlays cannot create entities. |
+| `NOT_NFC` | Any string value is not NFC normalized. |
+| `DUPLICATE_OVERLAY` | Two overlays for the same locale, kind and ID. |
+| `STALE_TRANSLATION` (warning) | `sourceHash` differs from the current English hash. |
+| `OUTDATED_REVIEWED_TRANSLATION` (error, strict only) | A `reviewed` overlay whose hash is stale. |
+| `DRAFT_NOT_PUBLISHABLE` (warning, strict only) | A `draft` overlay: valid, but a consumer must show English. |
+
+A translation is **publishable** only when it is `reviewed` and its hash matches. Missing translations are never an error in either mode; they are only counted as coverage.
+
+| Condition | Development (default) | Strict (`--strict-translations`) |
+| --- | --- | --- |
+| Invalid JSON, schema, locale, ID, path, NFC, duplicate | error | error |
+| `reviewed`, stale hash | warning | **error** |
+| `draft`, stale hash | warning | warning |
+| `draft`, current hash | accepted | accepted, reported as not publishable |
+| Missing translation | accepted | accepted |
+
+```sh
+npm run validate:curriculum
+npm run validate:curriculum -- --strict-translations
+```
+
+Warnings go to standard error and do not change the exit status; errors fail the command at the `localization` stage with status `1`. When `curriculum/locales/` exists, the success output adds a coverage line per locale (publishable, draft, outdated and missing counts). An unknown option is rejected. Without `curriculum/locales/` the command and its result are identical to before.
+
+Not implemented: translated module bodies and module digests, Markdown rendering, translated anchors, snapshot export of overlays, `curriculumVersion` policy for overlays, and any consumer behavior. The hash covers title and summary only, so objective or module changes do not make a translation stale.
 
 ## Tool references
 

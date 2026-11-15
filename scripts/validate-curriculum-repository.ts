@@ -4,6 +4,9 @@ import { validateCurriculumSemantics, type SemanticIssue } from './validate-curr
 import {
   validateContentReferences, type ContentCatalog, type ContentIssue, type ContentSummary,
 } from './validate-content-references.js';
+import {
+  validateLocalization, type LocalizationIssue, type LocalizationOptions, type LocalizationSummary,
+} from './validate-localization.js';
 
 /**
  * Tracks of the production curriculum that must contain every prerequisite of their members.
@@ -29,14 +32,24 @@ export interface RepositorySummary extends ContentSummary {
   tracks: { id: string; competencyIds: string[] }[];
 }
 
+export interface LocalizationReport {
+  warnings: LocalizationIssue[];
+  summary: LocalizationSummary;
+}
+
 export type RepositoryValidationResult =
-  | { valid: true; summary: RepositorySummary }
+  /** `localization` is present only when `curriculum/locales` exists. */
+  | { valid: true; summary: RepositorySummary; localization?: LocalizationReport }
   | { valid: false; stage: 'load'; errors: LoadIssue[] }
   | { valid: false; stage: 'structural'; errors: ValidationIssue[]; sources: CurriculumSources }
   | { valid: false; stage: 'semantic'; errors: SemanticIssue[]; sources: CurriculumSources }
   | {
     valid: false; stage: 'content';
     errors: (ContentIssue | AcceptanceIssue)[]; sources: CurriculumSources;
+  }
+  | {
+    valid: false; stage: 'localization';
+    errors: LocalizationIssue[]; warnings: LocalizationIssue[]; summary: LocalizationSummary;
   };
 
 // Fields read after the schema and semantic validators have accepted the aggregate.
@@ -84,10 +97,12 @@ export function validatePrerequisiteClosure(
 /**
  * Load the curriculum under `rootDir` and run every producer-side check in order:
  * loading, structure, graph semantics, then content references together with prerequisite
- * closure of `closedTrackIds`. A failing stage stops later stages. Nothing is written.
+ * closure of `closedTrackIds`, then localization overlays when `curriculum/locales` exists.
+ * A failing stage stops later stages. Nothing is written. Without overlays the result is
+ * identical to the one produced before localization existed.
  */
 export function validateCurriculumRepository(
-  rootDir: string, closedTrackIds: readonly string[] = [],
+  rootDir: string, closedTrackIds: readonly string[] = [], localization: LocalizationOptions = {},
 ): RepositoryValidationResult {
   const loaded = loadCurriculum(rootDir);
   if (!loaded.ok) return { valid: false, stage: 'load', errors: loaded.errors };
@@ -107,8 +122,21 @@ export function validateCurriculumRepository(
   if (!content.valid || errors.length > 0) {
     return { valid: false, stage: 'content', errors, sources };
   }
+  const translations = validateLocalization(rootDir, {
+    competencies: catalog.competencies as unknown as { id: string; title: string; summary: string }[],
+    tracks: catalog.tracks as unknown as { id: string; title: string }[],
+  }, localization);
+  if (translations.errors.length > 0) {
+    return {
+      valid: false, stage: 'localization',
+      errors: translations.errors, warnings: translations.warnings, summary: translations.summary,
+    };
+  }
   return {
     valid: true,
+    ...(translations.present
+      ? { localization: { warnings: translations.warnings, summary: translations.summary } }
+      : {}),
     summary: {
       curriculumVersion: catalog.manifest.curriculumVersion,
       competencyIds: catalog.competencies.map(({ id }) => id),

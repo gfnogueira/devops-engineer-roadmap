@@ -1,0 +1,16 @@
+{
+  "localizationVersion": 1,
+  "kind": "competency",
+  "locale": "pt-BR",
+  "id": "git-change-management",
+  "title": "Gerenciamento de Mudanças Locais com Git",
+  "summary": "Registrar, inspecionar e recuperar alterações em um repositório Git local de teste, evitar que credenciais fictícias sejam incluídas em novos commits e compreender as limitações das regras do .gitignore.",
+  "status": "reviewed",
+  "provenance": {
+    "sourceHash": "sha256:8cd09a088dbf9b0b3e2940873d587871aba8da3150384fbf9055008019e46745",
+    "method": "machine-assisted",
+    "translatedBy": "claude-sonnet-5-5 (AI-generated draft; no human translator)",
+    "reviewedBy": "gfnogueira",
+    "reviewedAt": "2026-11-15"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "localizationVersion": 1,
+  "kind": "competency",
+  "locale": "pt-BR",
+  "id": "terminal-file-operations",
+  "title": "Operações Seguras com Arquivos no Terminal",
+  "summary": "Navegar pelo ambiente de trabalho local, preservar e organizar arquivos, identificar problemas com caminhos e verificar se as operações de limpeza foram realizadas com segurança.",
+  "status": "reviewed",
+  "provenance": {
+    "sourceHash": "sha256:540de18fd9c540bf97022460716a62f06f1a7c7de8e4c650cc64a162e738a5fd",
+    "method": "machine-assisted",
+    "translatedBy": "claude-sonnet-5-5 (AI-generated draft; no human translator)",
+    "reviewedBy": "gfnogueira",
+    "reviewedAt": "2026-11-15"
+  }
+}

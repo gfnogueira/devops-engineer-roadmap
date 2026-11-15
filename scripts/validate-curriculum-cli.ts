@@ -1,7 +1,8 @@
 // Entry point for `npm run validate:curriculum`. Validates this repository's production
 // curriculum and exits with status 0 when it is valid, or 1 with diagnostics when it is not.
 // An optional argument names another repository root to validate with the same rules; the
-// tests use it with disposable synthetic repositories.
+// tests use it with disposable synthetic repositories. `--strict-translations` selects release
+// mode for localization overlays: reviewed translations whose English source changed fail.
 import { registerHooks } from 'node:module';
 import { resolve as resolvePath } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,7 +31,13 @@ const loadLine = ({ code, message }: LoadIssue): string => `[${code}]: ${message
 async function main(): Promise<void> {
   // The schema belongs to the repository that contains these scripts.
   const toolRoot = fileURLToPath(new URL('..', import.meta.url));
-  const rootArgument = process.argv[2];
+  const args = process.argv.slice(2);
+  const strictTranslations = args.includes('--strict-translations');
+  const unknownFlags = args.filter((arg) => arg.startsWith('--') && arg !== '--strict-translations');
+  if (unknownFlags.length > 0) {
+    return fail('arguments', [`Unknown option ${unknownFlags.join(', ')}. The only option is --strict-translations.`]);
+  }
+  const rootArgument = args.find((arg) => !arg.startsWith('--'));
   const rootDir = rootArgument === undefined ? toolRoot : resolvePath(rootArgument);
 
   // The structural validator reads and compiles the schema as soon as it is imported. Check
@@ -56,7 +63,7 @@ async function main(): Promise<void> {
     ]);
   }
 
-  const result = validators.validateCurriculumRepository(rootDir, validators.PREREQUISITE_CLOSED_TRACK_IDS);
+  const result = validators.validateCurriculumRepository(rootDir, validators.PREREQUISITE_CLOSED_TRACK_IDS, { strictTranslations });
   if (result.valid) {
     const { summary } = result;
     console.log(`Curriculum ${summary.curriculumVersion} is valid.`);
@@ -68,7 +75,22 @@ async function main(): Promise<void> {
       `Checked ${summary.markdownFiles} Markdown files and ${summary.internalLinks} internal links. `
       + `${summary.externalLinks} external links were not fetched.`,
     );
+    if (result.localization !== undefined) {
+      const { summary: coverage, warnings } = result.localization;
+      console.log(`Localization (${coverage.mode} mode):`);
+      for (const entry of coverage.locales) {
+        const text = (label: string, c: typeof entry.competencies): string =>
+          `${label} ${c.publishable} publishable, ${c.draft} draft, ${c.outdated} outdated, ${c.missing} missing`;
+        console.log(`- ${entry.locale}: ${text('competencies', entry.competencies)}; ${text('tracks', entry.tracks)}`);
+      }
+      // Warnings are diagnostics, not results: they go to standard error and do not change the status.
+      for (const warning of warnings) console.error(`- [${warning.code}] ${warning.file}: ${warning.message}`);
+    }
     return;
+  }
+  if (result.stage === 'localization') {
+    for (const warning of result.warnings) console.error(`- [${warning.code}] ${warning.file}: ${warning.message}`);
+    return fail('localization', result.errors.map(({ code, file, message }) => `[${code}] ${file}: ${message}`));
   }
   if (result.stage === 'load') return fail('load', result.errors.map(loadLine));
 

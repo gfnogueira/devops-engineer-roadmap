@@ -131,11 +131,16 @@ describe('validation command', () => {
 describe('validation command start-up order', () => {
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
   const SCHEMA = 'curriculum/schema/curriculum.schema.json';
+  const LOCALIZATION_SCHEMA = 'curriculum/schema/localization.schema.json';
   const realSchema = readFileSync(join(repoRoot, SCHEMA), 'utf8');
 
   /** A complete synthetic repository with its own scripts and schema. */
   function installed(schema: string = realSchema) {
-    const root = repository({ [SCHEMA]: schema, 'package.json': json({ type: 'module' }) });
+    const root = repository({
+      [SCHEMA]: schema,
+      [LOCALIZATION_SCHEMA]: readFileSync(join(repoRoot, LOCALIZATION_SCHEMA), 'utf8'),
+      'package.json': json({ type: 'module' }),
+    });
     mkdirSync(join(root, 'scripts'));
     for (const name of readdirSync(join(repoRoot, 'scripts'))) {
       copyFileSync(join(repoRoot, 'scripts', name), join(root, 'scripts', name));

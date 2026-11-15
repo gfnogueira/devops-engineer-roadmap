@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:devops-engineer-roadmap:localization:1",
+  "title": "Curriculum localization overlay contract v1",
+  "description": "Validates the structure of one translation overlay. Locale, file location, ID existence, NFC normalization and source-hash freshness require separate checks against the curriculum.",
+  "oneOf": [
+    { "$ref": "#/$defs/competencyOverlay" },
+    { "$ref": "#/$defs/trackOverlay" }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?![\\s\\S])"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "locale": {
+      "type": "string",
+      "enum": ["pt-BR"]
+    },
+    "sourceHash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}(?![\\s\\S])"
+    },
+    "reviewDate": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])(?![\\s\\S])"
+    },
+    "draftProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceHash", "method", "translatedBy"],
+      "properties": {
+        "sourceHash": { "$ref": "#/$defs/sourceHash" },
+        "method": { "type": "string", "enum": ["human", "machine-assisted"] },
+        "translatedBy": { "$ref": "#/$defs/text" }
+      }
+    },
+    "reviewedProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceHash", "method", "translatedBy", "reviewedBy", "reviewedAt"],
+      "properties": {
+        "sourceHash": { "$ref": "#/$defs/sourceHash" },
+        "method": { "type": "string", "enum": ["human", "machine-assisted"] },
+        "translatedBy": { "$ref": "#/$defs/text" },
+        "reviewedBy": { "$ref": "#/$defs/text" },
+        "reviewedAt": { "$ref": "#/$defs/reviewDate" }
+      }
+    },
+    "competencyOverlay": {
+      "type": "object",
+      "required": ["localizationVersion", "kind", "locale", "id", "title", "summary", "status", "provenance"],
+      "properties": {
+        "localizationVersion": { "type": "integer", "const": 1 },
+        "kind": { "const": "competency" },
+        "locale": { "$ref": "#/$defs/locale" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "title": { "$ref": "#/$defs/text" },
+        "summary": { "$ref": "#/$defs/text" },
+        "status": { "type": "string", "enum": ["draft", "reviewed"] },
+        "provenance": true
+      },
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/$defs/statusProvenance" }]
+    },
+    "trackOverlay": {
+      "type": "object",
+      "required": ["localizationVersion", "kind", "locale", "id", "title", "status", "provenance"],
+      "properties": {
+        "localizationVersion": { "type": "integer", "const": 1 },
+        "kind": { "const": "track" },
+        "locale": { "$ref": "#/$defs/locale" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "title": { "$ref": "#/$defs/text" },
+        "status": { "type": "string", "enum": ["draft", "reviewed"] },
+        "provenance": true
+      },
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/$defs/statusProvenance" }]
+    },
+    "statusProvenance": {
+      "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "reviewed" } } },
+      "then": { "type": "object", "properties": { "provenance": { "$ref": "#/$defs/reviewedProvenance" } } },
+      "else": { "type": "object", "properties": { "provenance": { "$ref": "#/$defs/draftProvenance" } } }
+    }
+  }
+}

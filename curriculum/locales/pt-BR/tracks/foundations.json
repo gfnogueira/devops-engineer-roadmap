@@ -1,0 +1,15 @@
+{
+  "localizationVersion": 1,
+  "kind": "track",
+  "locale": "pt-BR",
+  "id": "foundations",
+  "title": "Fundamentos",
+  "status": "reviewed",
+  "provenance": {
+    "sourceHash": "sha256:dbba71772c7a701403a4fa8acce084cec8cf3c707e7377485e50730a76100d00",
+    "method": "machine-assisted",
+    "translatedBy": "claude-sonnet-5-5 (AI-generated draft; no human translator)",
+    "reviewedBy": "gfnogueira",
+    "reviewedAt": "2026-11-15"
+  }
+}
