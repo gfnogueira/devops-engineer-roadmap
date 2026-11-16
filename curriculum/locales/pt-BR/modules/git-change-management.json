@@ -1,0 +1,12 @@
+{
+  "localizationVersion": 1,
+  "kind": "module",
+  "locale": "pt-BR",
+  "id": "git-change-management",
+  "status": "draft",
+  "provenance": {
+    "sourceHash": "sha256:7453d657abced420d2416d94de7073b0e5a4355132f3956e3662c3e8019ce775",
+    "method": "machine-assisted",
+    "translatedBy": "claude-sonnet-5-5 (AI-generated draft; no human translator)"
+  }
+}

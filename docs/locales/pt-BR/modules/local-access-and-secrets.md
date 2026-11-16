@@ -20,7 +20,7 @@ Use duas perguntas em conjunto: **quem precisa de qual operação?** e **de quai
 
 ## Pré-requisitos
 
-Competência obrigatória: [Operações Seguras com Arquivos no Terminal](../../../modules/terminal-file-operations.md) (módulo em inglês). Antes de começar, você deve ser capaz de identificar sua localização, colocar um caminho entre aspas, criar e inspecionar arquivos sintéticos, interpretar imediatamente um status de saída e remover apenas artefatos conhecidos do laboratório. Se precisar, use a [orientação sobre diretório inicial](../../../modules/terminal-file-operations.md#find-a-starting-directory) desse módulo. Não é necessário conhecer Git.
+Competência obrigatória: [Operações Seguras com Arquivos no Terminal](terminal-file-operations.md). Antes de começar, você deve ser capaz de identificar sua localização, colocar um caminho entre aspas, criar e inspecionar arquivos sintéticos, interpretar imediatamente um status de saída e remover apenas artefatos conhecidos do laboratório. Se precisar, use a [orientação sobre diretório inicial](terminal-file-operations.md#encontre-um-diretório-inicial) desse módulo. Não é necessário conhecer Git.
 
 Ambiente necessário:
 
@@ -122,19 +122,19 @@ Consulte os manuais locais do seu ambiente instalado. A verificação das fontes
 
 ## Laboratórios práticos
 
-### Prática: inspecionar a configuração de um worker fictício
+### Praticar: inspecionar a configuração de um worker fictício
 
 **Objetivo:** estabelecer um espaço de trabalho privado, preparar uma configuração somente para leitura, investigar uma falha de leitura controlada e preparar um relatório mínimo. Objetivos de aprendizagem: O1–O5. Todos os valores e observações dizem respeito ao `demo-worker` fictício; nenhum worker real é executado.
 
 #### 1. Estabeleça o limite
 
-Use a [orientação sobre diretório inicial](../../../modules/terminal-file-operations.md#find-a-starting-directory) do pré-requisito para entrar em um diretório pessoal local existente. Confirme com `pwd -P` e `ls -ld .`. Esse é o diretório pai de um novo espaço de trabalho, não um alvo de alteração de permissões. Inicie um shell filho:
+Use a [orientação sobre diretório inicial](terminal-file-operations.md#encontre-um-diretório-inicial) do pré-requisito para entrar em um diretório pessoal local existente. Confirme com `pwd -P` e `ls -ld .`. Esse é o diretório pai de um novo espaço de trabalho, não um alvo de alteração de permissões. Inicie um shell filho:
 
 ```sh
 env ENV= HISTFILE= /bin/sh
 ```
 
-Essas configurações de ambiente valem apenas para esse shell e evitam um arquivo de inicialização `ENV` e um nome de arquivo de histórico persistente; não são uma sandbox de segurança. No shell filho, inspecione a identidade:
+Essas configurações de ambiente valem apenas para esse shell e evitam que um arquivo de inicialização `ENV` seja lido e que o histórico do shell seja gravado em um arquivo persistente; não são uma sandbox de segurança. No shell filho, inspecione a identidade:
 
 ```sh
 id
@@ -356,7 +356,7 @@ Use a sua própria sequência de comandos e apresente estes resultados:
 4. **Validar (O1/O2/O4):** inspecione os modos finais, confirme que os três textos de entrada não mudaram, revise a resposta completa em comparação com o conteúdo permitido e execute uma verificação de marcador conhecido, interpretando corretamente a contagem e o status. Explique por que renomear um campo ou restringir o modo de um relatório que divulga informações não tornaria o conteúdo proposto apropriado para envio.
 5. **Limpar (O5):** após a avaliação, remova somente os artefatos do desafio e conclua a limpeza do laboratório pai. Não é necessário compartilhar nem enviar nada de fato.
 
-**Entregas:** os três textos de entrada inalterados e uma resposta, as observações finais de modo e suas justificativas, um registro antes/tentativa/depois da leitura, a decisão de divulgação, o resultado da verificação de marcador e a revisão completa do conteúdo, e a limpeza verificada. As evidências permanecem locais. Os cinco requisitos devem ser aprovados; uma leitura funcionando não compensa uma divulgação indevida, acesso excessivo, uma tentativa de imposição não verificada nem uma limpeza ausente.
+**Entregáveis:** os três textos de entrada inalterados e uma resposta, as observações finais de modo e suas justificativas, um registro antes/tentativa/depois da leitura, a decisão de divulgação, o resultado da verificação de marcador e a revisão completa do conteúdo, e a limpeza verificada. As evidências permanecem locais. Os cinco requisitos devem ser aprovados; uma leitura funcionando não compensa uma divulgação indevida, acesso excessivo, uma tentativa de imposição não verificada nem uma limpeza ausente.
 
 **Dicas opcionais:** distinga o que o nome de um arquivo sugere do que o conteúdo dele contém. Classifique os campos antes de redigir uma resposta. Acesso de leitura e permissão para compartilhar são decisões diferentes. Mantenha um breve registro privado de qual observação sustenta cada afirmação.
 
@@ -416,6 +416,6 @@ Revise O1–O4 enquanto os artefatos existem, faça a [limpeza do desafio](#limp
 
 ## Próximos passos
 
-Se o diagnóstico de caminhos ou a limpeza estiver incerto, revisite [Operações Seguras com Arquivos no Terminal](../../../modules/terminal-file-operations.md) (módulo em inglês). A [trilha de aprendizagem de Fundamentos](../../../learning-paths/foundations.md) (em inglês) mostra onde este módulo se encaixa entre os módulos atuais. Para melhorar este módulo, use o [guia de autoria do currículo](../../../curriculum-authoring-guide.md) (em inglês).
+Se o diagnóstico de caminhos ou a limpeza estiver incerto, revisite [Operações Seguras com Arquivos no Terminal](terminal-file-operations.md). A [trilha de aprendizagem de Fundamentos](../../../learning-paths/foundations.md) (em inglês) mostra onde este módulo se encaixa entre os módulos atuais. Para melhorar este módulo, use o [guia de autoria do currículo](../../../curriculum-authoring-guide.md) (em inglês).
 
-O [Gerenciamento de Mudanças Locais com Git](../../../modules/git-change-management.md) (módulo em inglês) está disponível, com a execução em laboratório pendente. Ele compartilha `terminal-file-operations` como pré-requisito obrigatório; este módulo não é uma dependência obrigatória adicional. O módulo de Git trata de staging e histórico, enquanto este módulo estabelece decisões sobre acesso local e divulgação. Identidades de serviço separadas, administração de ACLs, gerenciadores de segredos e tratamento real de incidentes exigem estudo adicional e estão fora deste exercício de Fundamentos.
+O [Gerenciamento Local de Mudanças com Git](git-change-management.md) está disponível, com a execução em laboratório pendente. Ele compartilha `terminal-file-operations` como pré-requisito obrigatório; este módulo não é uma dependência obrigatória adicional. O módulo de Git trata da área de preparação (staging area) e do histórico, enquanto este módulo estabelece decisões sobre acesso local e divulgação. Identidades de serviço separadas, administração de ACLs, gerenciadores de segredos e tratamento real de incidentes exigem estudo adicional e estão fora deste exercício de Fundamentos.

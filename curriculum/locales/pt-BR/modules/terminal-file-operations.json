@@ -1,0 +1,12 @@
+{
+  "localizationVersion": 1,
+  "kind": "module",
+  "locale": "pt-BR",
+  "id": "terminal-file-operations",
+  "status": "draft",
+  "provenance": {
+    "sourceHash": "sha256:bda3b7ca60692ecaa54d0a9167221e515b84baeb891621e4541a409c23cfc965",
+    "method": "machine-assisted",
+    "translatedBy": "claude-sonnet-5-5 (AI-generated draft; no human translator)"
+  }
+}

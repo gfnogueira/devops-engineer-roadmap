@@ -4,7 +4,7 @@ The Roadmap owns the canonical curriculum. C01 validates JSON structure; C02 add
 
 ## Localization overlays
 
-The structural contract below is English-only and stays at `schemaVersion` 1; `curriculum.schema.json` and the canonical records are unchanged. Translations are separate overlays with their own schema and version, described in [ADR 0001](adr/0001-curriculum-localization-overlays.md) and under [Localization overlay contract](#localization-overlay-contract). The infrastructure (schema, loader, validator, hash and tests) is implemented; the first reviewed `pt-BR` overlays (three competencies and the Foundations track) are included. Module overlays (complete translated Markdown modules) are supported by the contract as an additive extension of `localizationVersion` 1; no translated module exists yet.
+The structural contract below is English-only and stays at `schemaVersion` 1; `curriculum.schema.json` and the canonical records are unchanged. Translations are separate overlays with their own schema and version, described in [ADR 0001](adr/0001-curriculum-localization-overlays.md) and under [Localization overlay contract](#localization-overlay-contract). The infrastructure (schema, loader, validator, hash and tests) is implemented; the first reviewed `pt-BR` overlays (three competencies and the Foundations track) are included. Module overlays (complete translated Markdown modules) are supported by the contract as an additive extension of `localizationVersion` 1; three machine-assisted `pt-BR` draft module overlays (one per Foundations module) now exist; all remain `draft`, none is reviewed or publishable, and English stays canonical.
 
 ## Run the checks
 
@@ -511,7 +511,7 @@ npm run validate:curriculum -- --strict-translations
 
 Warnings go to standard error and do not change the exit status; errors fail the command at the `localization` stage with status `1`. When `curriculum/locales/` or `docs/locales/` exists, the success output adds a coverage line per locale (publishable, draft, outdated and missing counts for competencies, tracks and modules). An unknown option is rejected. Without either directory the command and its result are identical to before. Module coverage counts every competency module as translatable, so `missing` equals the number of modules without an overlay.
 
-Not implemented: real translated modules, Markdown rendering, a renderer-compatible translated anchor policy, snapshot export of overlays, `curriculumVersion` policy for overlays, translation of code comments, and any consumer behavior. Competency and track hashes cover title and summary only, so a module edit does not make a competency overlay stale; module overlays have their own hash over the whole English Markdown.
+Not implemented: reviewed (publishable) translated modules (the three `pt-BR` module overlays are unreviewed drafts), Markdown rendering, a renderer-compatible translated anchor policy, snapshot export of overlays, `curriculumVersion` policy for overlays, translation of code comments, and any consumer behavior. Competency and track hashes cover title and summary only, so a module edit does not make a competency overlay stale; module overlays have their own hash over the whole English Markdown.
 
 ## Tool references
 
