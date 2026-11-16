@@ -4,7 +4,7 @@
 
 **Competência:** `terminal-file-operations` · **Nível:** Fundamentos · **Revisão da avaliação:** 2
 
-Você está preparando uma pequena pasta de entrega (handoff, a passagem de informações de uma pessoa ou equipe para outra) para um serviço fictício. É preciso preservar as anotações originais, organizar uma cópia de trabalho, recuperar-se quando um arquivo parece ter sumido e remover seu trabalho temporário sem tocar em mais nada.
+Você está preparando uma pequena pasta de entrega (handoff, a passagem de informações de uma pessoa ou equipe para outra) para um serviço fictício. É preciso preservar as anotações originais, organizar uma cópia de trabalho, se recuperar quando um arquivo parece ter sumido e remover seu trabalho temporário sem tocar em mais nada.
 
 Siga **Aprender → Praticar → Construir → Validar**: leia os conceitos, conclua o laboratório guiado, resolva um desafio de entrega diferente e, por fim, inspecione as evidências em relação a cada critério de conclusão. O objetivo é explicar e verificar suas ações, não decorar comandos.
 
@@ -172,7 +172,7 @@ O conteúdo especificado de duas linhas do original o torna a referência para a
 
 #### 4. Diagnostique a falha segura
 
-Um colega diz que as anotações desapareceram depois que ele entrou no diretório de trabalho. Primeiro, preveja o resultado a seguir. Execute `cd` separadamente e confirme que teve sucesso antes das demais linhas:
+Um colega diz que as anotações desapareceram depois de entrar no diretório de trabalho. Primeiro, preveja o resultado a seguir. Execute `cd` separadamente e confirme que teve sucesso antes das demais linhas:
 
 ```sh
 cd ./work
@@ -213,9 +213,9 @@ printf 'Comparison status: %s\n' "$?"
 
 **Falha intencional esperada:** o noclobber rejeita o redirecionamento com um status diferente de zero. A comparação continua silenciosa, com status `0`. Se a sobrescrita tiver sucesso, a proteção não estava ativa: marque este ponto de verificação como reprovado, inspecione os arquivos e recupere a partir do backup íntegro. Não declare a verificação de proteção como aprovada apenas porque você reparou o resultado.
 
-Para uma alteração acidental na cópia de trabalho, inspecione o backup com `cat` e restaure somente o arquivo de trabalho com `cp -i './backup/service notes.txt' './work/handoff notes.txt'`. Confirme a substituição somente depois de ler os dois caminhos. Compare a cópia restaurada com o backup, depois acrescente a linha de revisão uma única vez e confira novamente as três linhas. Isto é uma orientação de recuperação, não um comando adicional para executar quando o resultado está correto.
+Para uma alteração acidental na cópia de trabalho, inspecione o backup com `cat` e restaure somente o arquivo de trabalho com `cp -i './backup/service notes.txt' './work/handoff notes.txt'`. Confirme a substituição somente depois de ler os dois caminhos. Compare a cópia restaurada com o backup, depois acrescente a linha de revisão uma única vez e confira novamente as três linhas. Esta é uma orientação de recuperação, não um comando adicional para executar quando o resultado está correto.
 
-Se um original foi removido acidentalmente, o backup intacto pode fornecer seu conteúdo novamente. Se as duas cópias sumirem, estes comandos não têm como desfazer: recrie **apenas este exercício sintético** a partir da entrada especificada e repita a avaliação. Não generalize esse método de recuperação para evidências reais. Evite seguir adiante enquanto algum ponto de verificação reprovado não estiver resolvido.
+Se um original foi removido acidentalmente, o backup intacto pode fornecer seu conteúdo novamente. Se as duas cópias sumirem, estes comandos não têm como desfazer a remoção: recrie **apenas este exercício sintético** a partir da entrada especificada e repita a avaliação. Não generalize esse método de recuperação para evidências reais. Evite seguir adiante enquanto algum ponto de verificação reprovado não estiver resolvido.
 
 #### 6. Mantenha o espaço de trabalho para o desafio
 
@@ -223,7 +223,7 @@ Mantenha o mesmo shell aberto e o diretório do laboratório no lugar. Continue 
 
 #### Retomar uma sessão interrompida
 
-Use este caminho depois de perder uma sessão ou quando uma nova configuração se recusa a criar o laboratório porque o seu, já registrado, existe. Se o shell do laboratório ainda estiver aberto e `test -n "$lab_root"` tiver sucesso, volte com `cd "$lab_root"`, confirme que `pwd -P` imprime o mesmo caminho antes de usar qualquer nome de arquivo relativo e, então, inspecione o estado usando a tabela abaixo. Se `lab_root` estiver vazia ou os caminhos forem diferentes, não use nomes relativos; use o bloco de restauração abaixo. Retomar não recria arquivos nem repete acréscimos.
+Use este caminho depois de perder uma sessão ou quando a configuração nova se recusa a prosseguir porque o laboratório que você registrou já existe. Se o shell do laboratório ainda estiver aberto e `test -n "$lab_root"` tiver sucesso, volte com `cd "$lab_root"`, confirme que `pwd -P` imprime o mesmo caminho antes de usar qualquer nome de arquivo relativo e, então, inspecione o estado usando a tabela abaixo. Se `lab_root` estiver vazia ou os caminhos forem diferentes, não use nomes relativos; use o bloco de restauração abaixo. Retomar não recria arquivos nem repete acréscimos.
 
 Se o shell do laboratório foi fechado, inicie um novo com o comando a seguir. Se você acabou de receber uma mensagem de falha na configuração e esse shell filho ainda estiver aberto, pule este comando e use o bloco de restauração diretamente; não aninhe outro shell.
 
@@ -339,7 +339,7 @@ Depois da revisão das evidências, volte à raiz do laboratório e inspecione `
 
 ### Perguntas
 
-Responda às seis perguntas antes de passar para a [orientações de resposta](#orientações-de-resposta). Cada resposta deve explicar o mecanismo e a próxima ação segura, não apenas citar um comando. Mantenha qualquer resposta escrita dentro do laboratório até revisá-la.
+Responda às seis perguntas antes de passar para as [orientações de resposta](#orientações-de-resposta). Cada resposta deve explicar o mecanismo e a próxima ação segura, não apenas citar um comando. Mantenha qualquer resposta escrita dentro do laboratório até revisá-la.
 
 1. **Q1 — O1/O3:** Por que `./inbox/service notes.txt` funciona na raiz do laboratório, mas falha dentro de `work`? Como você pode provar que o arquivo ainda existe?
 2. **Q2 — O2:** Que evidência distingue copiar, renomear e acrescentar neste exercício?

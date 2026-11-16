@@ -79,7 +79,7 @@ A permissão de escrita em um arquivo não é a mesma coisa que a permissão par
 
 ### O menor privilégio depende da tarefa
 
-O menor privilégio (*least privilege*) consiste em conceder apenas o acesso que a tarefa exige. Nossa política é o acesso exclusivo do proprietário. Os diretórios de trabalho precisam de `rwx` para inspeção, travessia e gerenciamento de entradas. Uma configuração já preparada precisa apenas de leitura para o proprietário; relatórios editáveis precisam de leitura e escrita para o proprietário. Outras contas não têm nenhum papel nesta simulação local. Que um relatório seja adequado para um destinatário **não** exige torná-lo legível por todos nem enviá-lo a algum lugar.
+O menor privilégio (*least privilege*) consiste em conceder apenas o acesso que a tarefa exige. Nossa política é o acesso exclusivo do proprietário. Os diretórios de trabalho precisam de `rwx` para inspeção, travessia e gerenciamento de entradas. Uma configuração já preparada precisa apenas de leitura para o proprietário; relatórios editáveis precisam de leitura e escrita para o proprietário. Outras contas não têm nenhum papel nesta simulação local. O fato de um relatório ser adequado para um destinatário **não** exige torná-lo legível por todos nem enviá-lo a algum lugar.
 
 [`chmod`](https://man7.org/linux/man-pages/man1/chmod.1p.html) altera o modo de um objeto existente. As formas simbólicas indicam uma classe (`u`, `g`, `o`) e uma operação: `u-r` remove a leitura do proprietário; `u+r` a restaura. Os modos numéricos atribuem bits de permissão: leitura vale 4, escrita 2 e execução/busca 1 em cada classe. Assim, `700` é `rwx` para o proprietário, `600` é `rw` para o proprietário e `400` é `r` para o proprietário, sem nenhum acesso básico para grupo/outros. Use alvos explícitos do laboratório e depois inspecione; o status de sucesso do comando, sozinho, não basta. A propriedade permite que um proprietário comum altere o modo do seu arquivo mesmo depois de remover o bit de leitura, desde que o caminho continue acessível. Nunca adicione acesso amplo apenas para silenciar um erro.
 
@@ -159,7 +159,7 @@ else
 fi
 ```
 
-**Ponto de verificação:** registre o caminho físico em particular; ele deve identificar o `local-access-and-secrets-lab` recém-criado. Espere o modo de diretório `drwx------` e a sua propriedade. `mkdir` sem `-p` recusa um nome existente. Não exclua um diretório existente para forçar a preparação; use outro diretório pai adequado ou [retome o seu laboratório conhecido](#retomar-uma-sessão-interrompida). Se a propriedade, o modo ou o local estiver errado, pare antes de criar qualquer conteúdo.
+**Ponto de verificação:** registre o caminho físico de forma privada; ele deve identificar o `local-access-and-secrets-lab` recém-criado. Espere o modo de diretório `drwx------` e a sua propriedade. `mkdir` sem `-p` recusa um nome existente. Não exclua um diretório existente para forçar a preparação; use outro diretório pai adequado ou [retome o seu laboratório conhecido](#retomar-uma-sessão-interrompida). Se a propriedade, o modo ou o local estiver errado, pare antes de criar qualquer conteúdo.
 
 #### 2. Crie a configuração sintética e inspecione o acesso
 

@@ -405,7 +405,7 @@ git diff --staged --name-only
 git diff --staged
 ```
 
-**Ponto de verificação — este é o erro intencional:** dois caminhos estão preparados e o diff preparado mostra a linha contendo `SYNTHETIC-NOT-A-CREDENTIAL-GUIDED`. A revisão o pegou **antes** de existir um commit. Observe o que a revisão não conseguiu impedir: o valor agora foi impresso na sua tela. Com um segredo real, isso por si só pode importar.
+**Ponto de verificação — este é o erro intencional:** dois caminhos estão preparados e o diff preparado mostra a linha contendo `SYNTHETIC-NOT-A-CREDENTIAL-GUIDED`. A revisão o detectou **antes** de existir um commit. Observe o que a revisão não conseguiu impedir: o valor agora foi impresso na sua tela. Com um segredo real, isso por si só pode importar.
 
 Remova da área de preparação somente esse arquivo e verifique:
 
@@ -416,7 +416,7 @@ git diff --staged --name-only
 cat ./local.env
 ```
 
-**Ponto de verificação:** somente `deploy-checklist.txt` continua preparado; `local.env` voltou a ser não rastreado e seu conteúdo não mudou. Tirar da preparação alterou a área de preparação, não o seu arquivo. Esta lição não verifica quando o Git descarta a cópia interna que fez enquanto o arquivo estava preparado; essa cópia não faz parte de nenhum commit.
+**Ponto de verificação:** somente `deploy-checklist.txt` continua preparado; `local.env` voltou a ser não rastreado e seu conteúdo não mudou. Remover o arquivo da preparação alterou a área de preparação, não o arquivo em si. Esta lição não verifica quando o Git descarta a cópia interna que fez enquanto o arquivo estava preparado; essa cópia não faz parte de nenhum commit.
 
 Revise mais uma vez e registre a mudança legítima:
 
@@ -661,7 +661,7 @@ Compare os dois caminhos com seus registros e confirme que as entradas são as q
 | O diretório do repositório existe, mas `git rev-parse --show-toplevel` falha ou imprime um caminho diferente | A inicialização não foi concluída. Pare e inspecione com `ls -a`. Se o diretório estiver vazio, remova-o pelo nome com `rmdir` a partir da raiz do laboratório e repita o passo 3 |
 | O nível superior está correto, mas a identidade não é a sintética | Somente depois de `git rev-parse --show-toplevel` imprimir o repositório esperado dentro do seu laboratório, execute `git config --local user.name 'Lab Learner'` e `git config --local user.email 'learner@example.invalid'`, além de `git config --local core.excludesFile /dev/null` se essa configuração estiver ausente. Depois, inspecione a listagem |
 | Há menos commits do que um passo espera | Compare o log com a lista do passo 12 e continue a partir da primeira mensagem ausente. Inspecione os arquivos antes de acrescentar algo; não acrescente uma linha que já esteja presente |
-| Há mudanças preparadas, mas não registradas | Leia `git diff --staged`. Faça o commit somente se corresponder ao passo em que você estava; caso contrário, tire o caminho da preparação com `git restore --staged <path>` e refaça a revisão desse passo |
+| Há mudanças preparadas, mas não registradas | Leia `git diff --staged`. Faça o commit somente se corresponder ao passo em que você estava; caso contrário, remova o caminho da área de preparação com `git restore --staged <path>` e refaça a revisão desse passo |
 | Um arquivo rastreado tem uma edição que você não reconhece | Inspecione-a com `git diff <path>`. Decida, pelo conteúdo, se ela pertence ao passo atual antes de descartar qualquer coisa |
 | `git status` informa uma reversão em andamento | Execute `git revert --abort`, confirme que o status está limpo e refaça o passo 11 a partir da linha `git status` |
 | O repositório do desafio já existe | Inspecione o status e o log. Não execute novamente o bloco de configuração dele; continue a partir do primeiro requisito inacabado |
@@ -732,7 +732,7 @@ fi
 - Nenhum link simbólico é listado.
 - O caminho não é o seu diretório pessoal, nem um projeto, nem um diretório de que você precise.
 
-Se qualquer verificação for inconclusiva, **pare e inspecione manualmente.** Não edite o auxiliar para fazê-lo passar, não digite o comando de remoção manualmente e não amplie o alvo dele. Um diretório de repositório deixado vazio por uma configuração que falhou pode ser removido pelo nome com `rmdir` a partir da raiz do laboratório, depois do que você pode verificar novamente. Se não conseguir explicar uma discrepância, deixe o diretório no lugar e peça ajuda. Um laboratório não removido é um problema pequeno; uma remoção errada, não.
+Se qualquer verificação for inconclusiva, **pare e inspecione manualmente.** Não edite o auxiliar para fazê-lo passar, não digite o comando de remoção manualmente e não amplie o alvo dele. Um diretório de repositório deixado vazio por uma configuração que falhou pode ser removido pelo nome com `rmdir` a partir da raiz do laboratório; só então você pode verificar novamente. Se não conseguir explicar uma discrepância, deixe o diretório no lugar e peça ajuda. Um laboratório não removido é um problema pequeno; uma remoção errada, não.
 
 **Ação 2 — remover.** Execute isto somente depois do ponto de verificação acima. Ele repete as verificações essenciais, inclusive que o arquivo marcador ainda existe como arquivo regular e não como link simbólico, e então pede que você digite o nome do diretório. O comando de remoção nomeia um diretório fixo e literal, relativo ao diretório pai verificado. Ele nunca recebe um caminho de uma variável, então uma variável vazia ou alterada não consegue redirecioná-lo.
 
@@ -774,7 +774,7 @@ A remoção não é um apagamento seguro e não afeta backups nem gravações do
 
 ### Construir: decidir o que pertence ao registro
 
-Um colega fictício passa a você, em uma entrega (handoff, a passagem de um trabalho em andamento de uma pessoa para outra), um segundo repositório do `demo-service` no meio do trabalho dele. Várias mudanças estão pendentes. Ele pede que você “faça o commit da correção do health-check” e acrescenta: “O arquivo de configurações do cache tem uma chave, mas tudo bem, ele está no `.gitignore`.”
+Um colega fictício passa a você, em uma entrega (handoff, a passagem de um trabalho em andamento de uma pessoa para outra), um segundo repositório do `demo-service` no meio do trabalho. Várias mudanças estão pendentes. O pedido é “faça o commit da correção do health-check”, seguido do comentário: “O arquivo de configurações do cache tem uma chave, mas tudo bem, ele está no `.gitignore`.”
 
 Decida o que pertence ao registro, mantenha credenciais falsas fora dos novos commits, teste a afirmação do colega com evidências e execute duas recuperações. Nenhuma receita de comandos é fornecida. Use apenas o que você praticou, em uma ordem que você escolha e consiga justificar.
 
@@ -848,7 +848,7 @@ O repositório do desafio fica dentro do mesmo diretório do laboratório e é r
 
 ### Perguntas
 
-Responda às dez antes de abrir a [orientações de resposta](#orientações-de-resposta). Explique o mecanismo e a próxima ação segura, não apenas o nome de um comando.
+Responda às dez antes de abrir as [orientações de resposta](#orientações-de-resposta). Explique o mecanismo e a próxima ação segura, não apenas o nome de um comando.
 
 1. **Q1 — O1:** Você edita um arquivo rastreado, prepara-o, edita-o de novo e faz o commit sem preparar outra vez. Qual versão o commit contém e onde está a outra versão?
 2. **Q2 — O1/O2:** Por que esta lição prepara caminhos explícitos e revisa `git diff --staged` antes de cada commit? Por que um `git diff` vazio não é evidência de que o próximo commit está vazio?
@@ -887,7 +887,7 @@ A conclusão é **autoavaliada**, ou uma pessoa colega pode revisar as mesmas ev
 | O1 — Registrar | Passos 3–5 do guia | Item 2 do desafio; Q1, Q2 | Nível superior do repositório verificado, a lista de commits com mensagens e uma explicação dos três lugares | Cada commit que você criou registra uma mudança selecionada, foi preparado por caminho explícito e tem uma mensagem descritiva; a pessoa aprendiz afirma corretamente onde uma mudança está em cada etapa |
 | O2 — Inspecionar | Passos 4–5 e 12 do guia | Item 1 do desafio; Q2, Q3 | Diffs não preparados e preparados antes de registrar, log e inspeção de commit depois, e a descrição do desafio baseada em evidências | As previsões concordam com os diffs observados; toda afirmação da descrição é sustentada pela saída de um comando nomeado |
 | O3 — Recuperar | Passos 6, 10 e 11 do guia | Item 5 do desafio; Q4, Q5 | Observações de antes e depois de uma remoção da preparação, de uma edição descartada e de uma reversão, com a declaração do que cada uma não consegue recuperar | Somente o caminho pretendido é afetado a cada vez; o conteúdo revertido é igual ao conteúdo registrado anteriormente; o commit original continua no log; os limites são declarados corretamente |
-| O4 — Proteger | Passos 6–9 do guia | Itens 3 e 4 do desafio; Q6, Q7, Q8 | Revisão da preparação que pegou o token falso; preparação recusada de um arquivo ignorado; evidência de arquivo rastreado contra a afirmação sobre a regra de ignorar; conteúdo antigo lido do histórico depois que o rastreamento parou; a resposta a uma exposição real | Nenhum commit criado pela pessoa aprendiz adiciona uma linha com marcador, exceto o commit do guia rotulado como erro intencional; a pessoa aprendiz separa ignorar, parar de rastrear e histórico, e cita a revogação pela pessoa responsável como a resposta |
+| O4 — Proteger | Passos 6–9 do guia | Itens 3 e 4 do desafio; Q6, Q7, Q8 | Revisão da preparação que detectou o token falso; preparação recusada de um arquivo ignorado; evidência de arquivo rastreado contra a afirmação sobre a regra de ignorar; conteúdo antigo lido do histórico depois que o rastreamento parou; a resposta a uma exposição real | Nenhum commit criado pela pessoa aprendiz adiciona uma linha com marcador, exceto o commit do guia rotulado como erro intencional; a pessoa aprendiz separa ignorar, parar de rastrear e histórico, e cita a revogação pela pessoa responsável como a resposta |
 | O5 — Limpar | Passos 1–3 e 12 do guia; limpeza | Item 6 do desafio; revisão da limpeza; Q9, Q10 | Versão do Git anotada, observações de nível superior e de ausência de remoto para os dois repositórios, origens da configuração, ação de verificação aprovada, confirmação digitada e observação final de ausência | Os dois repositórios estão dentro do laboratório e são independentes; não existe remoto; somente a configuração local está em vigor; o diretório do laboratório está ausente depois de uma remoção verificada e confirmada; nada fora dele foi tocado |
 
 **Aprovação:** cada linha e cada resposta da avaliação satisfazem seu critério. Segurança e limpeza são obrigatórias; nenhuma pontuação compensatória se aplica. **Ainda não aprovado:** qualquer linha sem evidência, um marcador adicionado por um commit fora do erro guiado rotulado, uma forma de preparação que seleciona tudo de uma vez, um arquivo não relacionado alterado ou removido, ou uma limpeza executada sem uma verificação aprovada.
