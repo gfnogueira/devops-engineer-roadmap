@@ -186,12 +186,17 @@ Before using the recovery below, state your hypothesis and one read-only check. 
 ```sh
 ls -a ..
 cat '../inbox/service notes.txt'
-cat "$lab_root/inbox/service notes.txt"
-cd "$lab_root"
-pwd -P
+if test -n "$lab_root" &&
+   cat "$lab_root/inbox/service notes.txt" &&
+   cd "$lab_root" &&
+   test "$(pwd -P)" = "$lab_root"; then
+  pwd -P
+else
+  printf '%s\n' 'STOP: Could not verify the lab files and working directory. Check lab_root, the expected files, and your current location before continuing.'
+fi
 ```
 
-**Checkpoint:** both reads show the same original two lines; you return to the recorded lab root. Explain why the relative path changed but the stored absolute path still worked. Record the failure, status, diagnosis, and evidence of recovery.
+**Checkpoint:** both reads show the same original two lines; you return to the recorded lab root, and no `STOP` line appears. The block changes directory only after `test -n` shows that `lab_root` is nonempty, because `cd ""` may report success without moving, and it compares your physical location with the recorded path before the lab's relative filenames are used again. Explain why the relative path changed but the stored absolute path still worked. Record the failure, status, diagnosis, and evidence of recovery.
 
 #### 5. Verify overwrite protection and recovery options
 
@@ -216,7 +221,7 @@ Keep the same shell open and the lab directory in place. Continue to the [indepe
 
 #### Resume an interrupted session
 
-Use this route after losing a session or when fresh setup refuses your own recorded, existing lab. If your lab shell is still open with a valid `lab_root`, keep using it and return with `cd "$lab_root"`, then inspect the state using the table below. Resuming does not recreate files or repeat appends.
+Use this route after losing a session or when fresh setup refuses your own recorded, existing lab. If your lab shell is still open and `test -n "$lab_root"` succeeds, return with `cd "$lab_root"`, confirm that `pwd -P` prints the same path before any relative filename is used, and then inspect the state using the table below. If `lab_root` is empty or the paths differ, do not use relative names; use the restoration block below. Resuming does not recreate files or repeat appends.
 
 If the lab shell closed, start a new one with the following command. If you just received a setup failure message and that child shell is still open, skip this command and use the restoration block directly; do not nest another shell.
 
@@ -257,10 +262,17 @@ Choose one checkpoint to resume and record what was already present. This route 
 
 Use this section after the [challenge](#practical-challenges), [questions](#questions), and [evidence review](#completion-criteria), or to stop an incomplete attempt safely. Finish inspecting evidence before removal. Keep personal evidence private; do not upload terminal transcripts with usernames or absolute personal paths. You can write a short redacted observation report in the lab and review it before deleting it.
 
-First return to the known workspace and inspect it. `&&` prevents inspection from running when `cd` fails. If the displayed directory is not your lab, **stop**.
+First return to the known workspace and inspect it. `test -n` requires a nonempty recorded path, because a shell may treat `cd ""` as success without changing directory. `&&` stops the sequence when any check fails, and the comparison confirms that your physical location equals the recorded path before anything is listed. If the displayed directory is not your lab, or a `STOP` line appears, **stop**.
 
 ```sh
-cd "$lab_root" && pwd -P && ls -a .
+if test -n "$lab_root" &&
+   cd "$lab_root" &&
+   test "$(pwd -P)" = "$lab_root"; then
+  pwd -P
+  ls -a .
+else
+  printf '%s\n' 'STOP: the recorded lab root is empty or does not match your location.'
+fi
 ```
 
 Remove challenge artifacts first if you created them, using [challenge cleanup](#challenge-cleanup). Remove any extra lab-owned report only after inspecting its explicit filename. Then run each of these commands separately, answering each prompt only after checking its target. `rm -i` permanently removes these named entries when you affirm; answer `n` when uncertain.
@@ -293,7 +305,7 @@ fi
 
 **Checkpoint:** the success message appears only after removal and the check of the recorded absolute path; the child shell then ends, leaving the parent shell's settings unchanged. `test` reports conditions through its status; `! -e` checks that a path does not resolve to an existing entry. Here it is supporting evidence after a successful `rmdir`, not a substitute for that result. See [test](https://man7.org/linux/man-pages/man1/test.1p.html).
 
-On failure, keep the shell open and inspect the error. Run `pwd -P` to see whether you are still inside the lab or have reached its parent. If `rmdir` reported remaining contents, inspect `ls -a "$lab_root"`, then return with `cd "$lab_root"` before removing any identified leftover by its explicit name. If the variable is missing or the directory cannot be located, use the recorded path and the resume procedure; do not guess. Retry the final block only from the verified lab root. After successful cleanup, return to the [completion criteria](#completion-criteria) to finish O5.
+On failure, keep the shell open and inspect the error. Run `pwd -P` to see whether you are still inside the lab or have reached its parent. If `rmdir` reported remaining contents and `lab_root` is nonempty, inspect `ls -a "$lab_root"`, then rerun the first block of this section, which requires a nonempty `lab_root`, enters it, and compares `pwd -P`, before removing any identified leftover by its explicit name. If the variable is missing or the directory cannot be located, use the recorded path and the resume procedure; do not guess. Retry the final block only from the verified lab root. After successful cleanup, return to the [completion criteria](#completion-criteria) to finish O5.
 
 ## Practical Challenges
 
