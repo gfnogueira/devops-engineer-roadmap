@@ -254,7 +254,7 @@ Cases with `P` in the matrix verify claims the modules make about their own safe
 | **L3 old-Git image** (recommended, narrow) | `GCM-G02` only | An image whose packaged Git is older than 2.32.0 shows the real version gate refusing. Acceptance of exactly 2.32.0 cannot be shown without building that release from source, which needs a provenance review (gap G-2) |
 | **VM** (required for one case) | `LAS-P01` | A disposable Linux VM isolates the uid-0 probe at the hypervisor boundary. A rootless user-namespace container is an acceptable alternative if the maintainer approves it. Root inside a default container with default capabilities is not recommended even without mounts |
 
-Container controls (illustrative; to be finalized and reviewed at the Phase 2 gate, not executed now): an image pinned by digest after a provenance review; a non-root user; no network; all capabilities dropped; no new privileges; a read-only root filesystem with a tmpfs home owned by the test user and mode `700`; no volume or bind mounts; no container socket; no host environment or credential passed through; resource and process limits; a throwaway container removed after evidence extraction. Evidence leaves through one extraction step, not a shared mount. A fresh container is started for each run in the matrix, so no state leaks between runs. Docker Desktop on macOS runs containers in a Linux VM; that is acceptable for L1 because the lab stays inside the container, and it demonstrates nothing about macOS.
+Container controls (the fixed baseline is in the [Linux L1 environment](foundations-linux-environment.md); the list below was the original illustrative form): an image pinned by digest after a provenance review; a non-root user; no network; all capabilities dropped; no new privileges; a read-only root filesystem with a tmpfs home owned by the test user and mode `700`; no volume or bind mounts; no container socket; no host environment or credential passed through; resource and process limits; a throwaway container removed after evidence extraction. Evidence leaves through one extraction step, not a shared mount. A fresh container is started for each run in the matrix, so no state leaks between runs. Docker Desktop on macOS runs containers in a Linux VM; that is acceptable for L1 because the lab stays inside the container, and it demonstrates nothing about macOS.
 
 Is a container sufficient? For all 84 non-VM cases, yes, under the controls above; the container's ext4 or tmpfs filesystem honors modes, ownership, and the Git behavior studied. It is insufficient only for the root-bypass probe (D07), which needs a VM, and it says nothing about ACL, SELinux, or organization-policy interference (gap G-4).
 
@@ -420,5 +420,20 @@ Phase 2 may begin only after the maintainer reviews this plan and decides the it
 | OD-6 | Where evidence is stored | A private location outside the repository; sanitized summary only later |
 | OD-7 | Provenance of images and (optionally) a source-built Git 2.32.0 | Pin by digest after review; skip the source build unless needed |
 | OD-8 | Link to the formal C07 process | None unless C07's own gate decides to adopt results |
+
+### Decisions recorded for Phase 2 (2026-11-16)
+
+The maintainer set the following working configuration. It records operational choices only; it changes no curriculum content, and it does not authorize executing any case by itself.
+
+| ID | Decision |
+| --- | --- |
+| OD-1 | macOS `HIGH-RISK` cases require a dedicated account or a disposable VM; the temporary-directory class M0 is not allowed for them |
+| OD-2 | Execution is assisted and interactive, one block at a time through a pseudo-terminal; every `HIGH-RISK` block needs its own approval |
+| OD-3 | One interruption and recovery scenario per module (`TFO-G11`, `LAS-G10`, `GCM-G19`); the other resume rows stay gap G-1 |
+| OD-4 | `LAS-P01` is deferred to a disposable VM and is not part of the container runs |
+| OD-5 | No conditional failure is injected in this round; `TFO-G09`, `LAS-G08`, `LAS-C07` and `GCM-G17` stay `NOT APPLICABLE` by design if executed at all |
+| OD-6 | Evidence is stored outside the repository, in a private directory named `.project-evidence/foundations-lab-validation/` at the workspace root; only a reviewed, sanitized summary may later be proposed for the repository |
+| OD-7 | A reviewed Ubuntu 24.04 base image pinned by digest, with a minimal derived image that adds Git; see the [Linux L1 environment](foundations-linux-environment.md) |
+| OD-8 | All evidence and processes stay separate from C07 |
 
 Recommended Phase 2 sequence: (1) maintainer review and decisions; (2) environment preparation and a fingerprint-only smoke run on Linux L1, with no lab command; (3) Linux execution of `SAFE`, then `CONTROLLED`, then supervised `HIGH-RISK` cases, each run in a fresh container; (4) the L3 old-Git gate and, if approved, `LAS-P01` in a VM; (5) macOS environment preparation and a fingerprint-only smoke run; (6) macOS execution in the same order; (7) review of evidence, the divergence register, and the canonical issues, and a separate authorized proposal for any curriculum or banner change. Each step needs its own authorization; completion of one does not authorize the next.
