@@ -122,7 +122,7 @@ A commit message states what changed and why in a short line, for example `Add d
 
 `git restore <path>` is the one operation in this lesson that destroys work, so name one explicit path and inspect `git diff` for that path first. See [git restore](https://git-scm.com/docs/git-restore).
 
-`git revert` requires that tracked files have no pending modifications, and it normally opens an editor for the message; `--no-edit` accepts the generated message. Reverting a commit that later commits built upon can produce conflicts, which need skills beyond this lesson. Here you only revert a small change that nothing else depends on. See [git revert](https://git-scm.com/docs/git-revert).
+Git may refuse a revert when pending changes to tracked files would be overwritten, but not every pending modification blocks it. This laboratory applies the more conservative rule: begin with a clean working tree, with no pending changes to tracked files, so the result of the revert is easy to interpret. Git normally opens an editor for the message; `--no-edit` accepts the generated message. Reverting a commit that later commits built upon can produce conflicts, which need skills beyond this lesson. Here you only revert a small change that nothing else depends on. See [git revert](https://git-scm.com/docs/git-revert).
 
 Commands that discard whole sets of changes or rewrite existing commits are not used or needed in this module.
 
@@ -346,7 +346,7 @@ git log -1 --format='author: %an <%ae> | committer: %cn <%ce>'
 git status
 ```
 
-**Checkpoint:** the log shows one commit with your message. The formatted line shows `Lab Learner <learner@example.invalid>` as both author and committer. If either shows any other identity, something in your environment is overriding the lab settings: **stop**, make no further commits, and use [cleanup](#cleanup-after-assessment) before starting again in a fresh lab shell. The checklist is still untracked: a commit records the staging area, not the whole directory.
+**Checkpoint:** the log shows one commit with your message. Depending on your Git version and configuration, `git log --oneline` may also show optional decorations such as `(HEAD -> main)` after the short ID, and the branch name may differ; compare the commit message and the order, not the exact formatting. The formatted line shows `Lab Learner <learner@example.invalid>` as both author and committer. If either shows any other identity, something in your environment is overriding the lab settings: **stop**, make no further commits, and use [cleanup](#cleanup-after-assessment) before starting again in a fresh lab shell. The checklist is still untracked: a commit records the staging area, not the whole directory.
 
 Record the checklist as its own commit, reviewing it first:
 
@@ -744,8 +744,9 @@ if test -n "$cleanup_verified_root" &&
    test ! -L ./git-change-management-lab/.lab-marker &&
    test "$(cd ./git-change-management-lab && pwd -P)" = "$cleanup_verified_root"; then
   printf '%s' 'Type the lab directory name to confirm permanent removal: '
-  read -r cleanup_answer
-  if test "$cleanup_answer" = 'git-change-management-lab'; then
+  cleanup_answer=
+  if IFS= read -r cleanup_answer &&
+     test "$cleanup_answer" = 'git-change-management-lab'; then
     if rm -rf ./git-change-management-lab &&
        test ! -e ./git-change-management-lab; then
       unset cleanup_verified_root git_lab_root
@@ -761,7 +762,7 @@ else
 fi
 ```
 
-`rm -r` removes a directory and everything below it; `-f` suppresses the per-file questions that Git's read-only internal files would otherwise trigger. The command removes a symbolic link itself rather than what it points to, and the checks above already refuse to proceed when the lab directory is a link. Typing anything other than the exact name cancels.
+`rm -r` removes a directory and everything below it; `-f` suppresses the per-file questions that Git's read-only internal files would otherwise trigger. The command removes a symbolic link itself rather than what it points to, and the checks above already refuse to proceed when the lab directory is a link. `IFS= read -r` keeps the typed line exactly as entered, including leading or trailing spaces and tabs, and a failed `read` (for example, end of input) cancels as well. Typing anything other than the exact name, including the name with surrounding whitespace, or an empty line, cancels.
 
 **Checkpoint:** `Lab directory removed.` appears only after the removal succeeded and the path no longer exists. Your current directory is the parent, which was never a removal target. Type `exit` to leave the lab shell; the isolation settings end with it and your own Git configuration was never changed. On any `STOP`, the shell stays open: run `pwd -P` and `ls -a`, and repeat the verification action rather than improvising.
 
