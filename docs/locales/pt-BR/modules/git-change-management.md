@@ -1,4 +1,4 @@
-# Gerenciamento Local de Mudanças com Git
+# Gerenciamento de Mudanças Locais com Git
 
 ## Visão geral
 
