@@ -10,7 +10,7 @@ Everything happens in a disposable directory on your own computer. No remote rep
 
 Follow **Learn → Practice → Build → Validate**: read the concepts, complete the guided lab in `guided-repo`, solve a different situation in `challenge-repo`, then review your evidence against every completion criterion before cleanup. The goal is to predict and verify what Git will do, not to memorize commands.
 
-**Verification status:** the resources listed below were opened and their relevant content inspected on **2026-11-13**. Commands received documentation, safety, portability, and shell-syntax review only. The laboratory and challenge have **not been executed**. Git behavior, Linux/macOS compatibility, interruption recovery, and cleanup remain pending practical validation; no Git version has been practically tested with this lesson. Checkpoints describe expected results, not recorded results. A shell syntax check does not establish that a Git command behaves as described.
+**Verification status:** the resources listed below were opened and their relevant content inspected on **2026-11-13**. Commands received documentation, safety, portability, and shell-syntax review only. The laboratory and challenge have **not been executed**. Git behavior, Linux/macOS compatibility, interruption recovery, and cleanup remain pending practical validation; no Git version has been practically tested with this lesson. Checkpoints describe expected results, not recorded results. A shell syntax check does not establish that a Git command behaves as described. The corrections made after an independent review (staging recoverability, untracked files, challenge criteria, unborn `HEAD`, tracing variables, interrupted cleanup) have likewise not been executed.
 
 ## Why It Matters
 
@@ -91,6 +91,8 @@ A file Git has been told about is **tracked**; a file Git merely sees in the dir
 
 A **commit** is identified by a long hexadecimal ID; `git log --oneline` shows a short form. IDs depend on content, author, and time, so yours will differ from anyone else's and from any example. `HEAD` names the commit your work currently builds on. `HEAD~1` means the commit before it, and `HEAD~2` the one before that. See the [Git glossary](https://git-scm.com/docs/gitglossary).
 
+Three names are used precisely in this lesson. **HEAD** is the latest commit. The **index** is the staging area. The **working tree** is the files you edit. A path can hold a different version in each. A repository with no commits yet has an **unborn HEAD**: `HEAD` names nothing, `git status` reports `No commits yet`, and `git log` fails with a message that the branch does not have any commits yet.
+
 The staging area is a simplification here: the glossary describes further uses during merges, which are outside this lesson.
 
 ### Inspect before and after you record
@@ -100,13 +102,14 @@ Each question has its own command. Use the one that answers what you need to kno
 | Question | Command |
 | --- | --- |
 | What is changed, staged, or untracked right now? | [`git status`](https://git-scm.com/docs/git-status) |
-| What did I change that is **not** staged? | [`git diff`](https://git-scm.com/docs/git-diff) |
+| What did I change in **tracked** files that is not staged? | [`git diff`](https://git-scm.com/docs/git-diff) |
+| Which untracked files exist, and what do they contain? | `git status` lists them; read each one with an ordinary file viewer, or list them with `git ls-files --others --exclude-standard` (ignored files are omitted) |
 | What exactly would the next commit record? | `git diff --staged` |
 | Which commits exist, newest first? | [`git log --oneline`](https://git-scm.com/docs/git-log) |
 | What did one commit change? | [`git show`](https://git-scm.com/docs/git-show) |
 | Which files are tracked? | [`git ls-files`](https://git-scm.com/docs/git-ls-files) |
 
-A diff marks added lines with `+` and removed lines with `-`. An empty `git diff` does not mean nothing will be committed; it only means the working tree matches the staging area. `git diff --staged` is the review that matters before a commit, and it is the security control of this module.
+A diff marks added lines with `+` and removed lines with `-`. `git diff` compares the working tree with the index for **tracked** files only; it never lists untracked files. An empty `git diff` therefore does not mean nothing will be committed, and it does not prove that every change is staged: it can also be empty while a new file is still untracked. Read `git status` for untracked files, `git diff` for unstaged edits, and `git diff --staged` for what the next commit will record. `git diff --staged` is the review that matters before a commit, and it is the security control of this module.
 
 Stage **explicit paths** such as `git add ./service-notes.txt`. Forms that stage everything at once select by location rather than by decision, and are how unrelated drafts and credentials enter history. This lesson never uses them. See [git add](https://git-scm.com/docs/git-add).
 
@@ -116,11 +119,15 @@ A commit message states what changed and why in a short line, for example `Add d
 
 | Situation | Operation | What it changes | What it cannot recover |
 | --- | --- | --- | --- |
-| Something is staged that should not be | `git restore --staged <path>` | Only the staging area; the file in the working tree keeps its content | Nothing is lost. It does not hide content already shown on screen or already committed |
+| Something is staged that should not be | `git restore --staged <path>` | Only the index. If the path exists in `HEAD`, the staged version is replaced by the `HEAD` version. If the path does **not** exist in `HEAD` (for example, a file you just created and staged), the path is removed from the index and becomes untracked again. In both cases the file in the working tree keeps its content | A **staged version that exists nowhere else**: if you staged a file and then edited it again, the staged version differs from both `HEAD` and the working tree, and unstaging discards it. It does not hide content already shown on screen or already committed |
 | A tracked file has an uncommitted edit you do not want | `git restore <path>` | Overwrites that file in the working tree with the staged version | **The discarded edit is gone.** It was never committed, so Git has no copy |
 | A recorded commit must be withdrawn | `git revert <commit>` | Adds a **new** commit that applies the opposite change | It does not delete the original commit, which stays in history with its content |
 
-`git restore <path>` is the one operation in this lesson that destroys work, so name one explicit path and inspect `git diff` for that path first. See [git restore](https://git-scm.com/docs/git-restore).
+`git restore <path>` is the operation in this lesson that most plainly destroys work, so name one explicit path and inspect `git diff` for that path first. See [git restore](https://git-scm.com/docs/git-restore).
+
+**Unstaging and recoverability.** Before unstaging, compare the three versions of the path: `git diff --staged -- <path>` (index against `HEAD`) and `git diff -- <path>` (working tree against index). If the second is empty, the working file already holds the staged content, so unstaging loses nothing. If it is not empty, the staged version is not in your file or in any commit. When Git staged it, it stored that content as an internal object, and such an object may remain for some time. That does not make recovery guaranteed: nothing in a commit or branch refers to it, Git's cleanup may remove it, and this lesson does not teach how to search for it. If that version matters, save it before unstaging: `git show :./<path>` prints the staged content, which you can redirect to a new file with a different name.
+
+**Recovery before the first commit.** With an unborn `HEAD`, `git restore --staged <path>` fails with `fatal: could not resolve 'HEAD'`, because there is no version to reset to. Recognize this state by `No commits yet` in `git status`. To unstage a path, use `git rm --cached -- <path>`, which removes it from the index only and leaves the working file in place. If Git refuses because the staged content differs from both the file and `HEAD`, **do not add `-f`**; first run `git add -- <path>` so that the index matches the file you want to keep, then run `git rm --cached -- <path>` again. Check with `git status` that the file is untracked and still present. If `git rm --cached` instead reports `fatal: pathspec '<path>' did not match any files`, Git found no such entry in the index: the path is not staged (or is misspelled), so there is nothing to undo. Run `git status` and `git ls-files` to confirm, check the spelling of the path, and do not add `-f` or recreate anything to make the message go away. Do not delete `.git` or recreate the repository to start over: that removes Git's records of the lab, not only the mistake.
 
 Git may refuse a revert when pending changes to tracked files would be overwritten, but not every pending modification blocks it. This laboratory applies the more conservative rule: begin with a clean working tree, with no pending changes to tracked files, so the result of the revert is easy to interpret. Git normally opens an editor for the message; `--no-edit` accepts the generated message. Reverting a commit that later commits built upon can produce conflicts, which need skills beyond this lesson. Here you only revert a small change that nothing else depends on. See [git revert](https://git-scm.com/docs/git-revert).
 
@@ -130,7 +137,7 @@ Commands that discard whole sets of changes or rewrite existing commits are not 
 
 A **secret** is information whose disclosure enables access or another sensitive action: a password, token, or private key. In this module every such value is fake and begins `SYNTHETIC-NOT-A-CREDENTIAL-`. It cannot authenticate to anything. Never substitute a real value.
 
-Commits are durable and are meant to be copied. Once a repository is shared, every copy contains every recorded commit. A secret in a commit is therefore readable by everyone who has, or later obtains, a copy, including in old commits that no current file shows.
+Commits are durable and are meant to be copied. Once a repository is shared, each full copy (for example, a clone) normally contains the commits that existed when it was made, and later copies receive the history that is shared with them. Shallow or partial copies may hold less, and a branch that was never shared is not in other people's copies. A secret in a commit is therefore readable by everyone who has, or later obtains, a copy that includes it, including in old commits that no current file shows. You cannot tell from your own repository who holds such a copy.
 
 Two consequences follow. First, prevention happens at staging time: read `git diff --staged` and judge the **content**, because a file called `deploy-summary.txt` can hold a token as easily as one called `secrets.env`. Second, if a real credential was recorded or shared, deleting or hiding it is not the response. The response is to tell the credential's owner and have it revoked or replaced through their process, so the exposed value stops working. The [OWASP Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html) describes revocation as part of a secret's lifecycle. GitHub's guidance on [removing sensitive data](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository) likewise names revoking or rotating the secret as the first step, and notes that rewriting history has side effects and may not be warranted afterwards.
 
@@ -166,7 +173,9 @@ The lab therefore starts a child shell with environment variables that affect on
 | `GIT_PAGER=cat` | Output prints directly instead of opening a pager |
 | `GIT_EDITOR=true` | No text editor opens. A commit attempted without `-m` receives an empty message and is expected to be refused |
 
-Environment variables can also work against the lab. Variables such as `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`, `GIT_COMMITTER_NAME`, and `GIT_COMMITTER_EMAIL` override the identity stored in configuration, so setting `user.name` and `user.email` is not sufficient on its own. Others add configuration values (`GIT_CONFIG_COUNT`), change the template used by `git init` (`GIT_TEMPLATE_DIR`), point Git at a different repository (`GIT_DIR`), change how Git searches parent directories for a repository (`GIT_CEILING_DIRECTORIES`, `GIT_DISCOVERY_ACROSS_FILESYSTEM`), or alter how differences are displayed (`GIT_EXTERNAL_DIFF`, `GIT_DIFF_OPTS`). Most shells have none of these set, but a development environment can define them. The lab shell therefore removes them with `unset` before the first Git command. `unset` affects only the lab shell; removing a variable that was never set is harmless. You then confirm the result by reading the identity recorded in your first commit.
+Environment variables can also work against the lab. **Tracing variables** are one case: `GIT_TRACE` and its relatives (`GIT_TRACE2`, `GIT_TRACE2_EVENT`, `GIT_TRACE2_PERF`, `GIT_TRACE_SETUP`, `GIT_TRACE_PACKET`, `GIT_TRACE_PERFORMANCE` and others) can name a file path, and Git then appends diagnostic lines about every command to it. If your environment sets one, lab commands would write outside the lab directory, and the output can include paths and command arguments. Because the lab shell inherits your environment, it removes them before the first Git command.
+
+Other variables change behavior instead. `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`, `GIT_COMMITTER_NAME`, and `GIT_COMMITTER_EMAIL` override the identity stored in configuration, so setting `user.name` and `user.email` is not sufficient on its own. Others add configuration values (`GIT_CONFIG_COUNT`), change the template used by `git init` (`GIT_TEMPLATE_DIR`), point Git at a different repository (`GIT_DIR`), change how Git searches parent directories for a repository (`GIT_CEILING_DIRECTORIES`, `GIT_DISCOVERY_ACROSS_FILESYSTEM`), or alter how differences are displayed (`GIT_EXTERNAL_DIFF`, `GIT_DIFF_OPTS`). Most shells have none of these set, but a development environment can define them. The lab shell therefore removes them with `unset` before the first Git command. `unset` affects only the lab shell; removing a variable that was never set is harmless. You then run a check that prints the name of any other `GIT_*` variable still set (never its value); the lab expects it to print nothing. A name-based check is used rather than counting variables, because a count would still pass if one expected setting went missing while an unexpected one appeared. Later you confirm the identity recorded in your first commit. The names removed are a reviewed selection, not a complete inventory of every variable Git reads, so this check shows that the known variables are cleared; it does not prove complete isolation.
 
 All identity and behavior settings in the lab use `git config --local`. One of them, `core.excludesFile`, points the lab repositories away from any personal ignore file, so that only the rules you write are in effect. These measures make the lesson predictable; they are not a security sandbox, and they do not protect a real secret.
 
@@ -219,9 +228,21 @@ unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_AUTHOR_DATE
 unset GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL GIT_COMMITTER_DATE
 unset GIT_CONFIG GIT_CONFIG_SYSTEM GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS GIT_TEMPLATE_DIR
 unset GIT_EXTERNAL_DIFF GIT_DIFF_OPTS GIT_CEILING_DIRECTORIES GIT_DISCOVERY_ACROSS_FILESYSTEM
+unset GIT_TRACE GIT_TRACE2 GIT_TRACE2_EVENT GIT_TRACE2_PERF GIT_TRACE2_CONFIG_PARAMS GIT_TRACE2_ENV_VARS
+unset GIT_TRACE2_BRIEF GIT_TRACE2_EVENT_BRIEF GIT_TRACE2_PERF_BRIEF GIT_TRACE2_EVENT_NESTING GIT_TRACE2_DST_DEBUG
+unset GIT_TRACE_PACKET GIT_TRACE_PERFORMANCE GIT_TRACE_SETUP GIT_TRACE_SHALLOW GIT_TRACE_CURL GIT_TRACE_CURL_NO_DATA
+unset GIT_TRACE_PACK_ACCESS GIT_TRACE_PACKFILE GIT_TRACE_FSMONITOR GIT_TRACE_REFS GIT_TRACE_REDACT
 ```
 
-These lines print nothing. Then run the version check. It is a safety helper: it reads the text printed by `git --version`, extracts the first two numbers, and compares them with the minimum. You do not need to memorize its syntax.
+These lines print nothing. Then run the check below. It lists the **names** (never the values, which could contain paths or secrets) of any Git variable in this shell that is **not** one of the five lab settings. The five lab settings are filtered out on purpose, so the expected result is that **nothing is printed**:
+
+```sh
+env | sed -n 's/^\(GIT_[A-Za-z0-9_]*\)=.*/\1/p' | grep -v -x -e GIT_CONFIG_GLOBAL -e GIT_CONFIG_NOSYSTEM -e GIT_TERMINAL_PROMPT -e GIT_PAGER -e GIT_EDITOR
+```
+
+**Checkpoint:** nothing is printed. The check hides only the five names this lab sets itself (`GIT_CONFIG_GLOBAL`, `GIT_CONFIG_NOSYSTEM`, `GIT_TERMINAL_PROMPT`, `GIT_PAGER`, and `GIT_EDITOR`) and prints every other `GIT_*` name found in the environment. Its exit status is `1` when nothing is printed, because `grep -v` reports that no line was selected; that is the expected result here, not a failure. If a name is printed, especially one containing `TRACE`, `CONFIG`, `DIR`, or `ASKPASS`, run `unset NAME` for it and run the check again until nothing is printed. If you cannot explain a name, type `exit` and ask for help before running Git: a variable you did not choose can send output outside the lab or change behavior. The `unset` lines above cannot name variables that future Git versions add, or whose names vary (such as `GIT_CONFIG_KEY_0`), which is why this check reads the actual environment instead of trusting a fixed list or a count.
+
+Then run the version check. It is a safety helper: it reads the text printed by `git --version`, extracts the first two numbers, and compares them with the minimum. You do not need to memorize its syntax.
 
 ```sh
 git_version_text=$(git --version)
@@ -379,7 +400,7 @@ git diff
 git diff --staged
 ```
 
-**Checkpoint:** the results swap. `git diff` is now empty and `git diff --staged` shows the added line. Explain why an empty `git diff` at this moment does not mean "nothing will be committed."
+**Checkpoint:** the results swap. `git diff` is now empty and `git diff --staged` shows the added line. Explain why an empty `git diff` at this moment does not mean "nothing will be committed," and why, in the other direction, it would not prove that everything is staged: it never lists untracked files, so you also read `git status`.
 
 ```sh
 git commit -m 'Mark service notes ready for review'
@@ -414,7 +435,7 @@ git diff --staged --name-only
 cat ./local.env
 ```
 
-**Checkpoint:** only `deploy-checklist.txt` remains staged; `local.env` is untracked again and its content is unchanged. Unstaging altered the staging area, not your file. This lesson does not verify when Git discards the internal copy it made while the file was staged; that copy is not part of any commit.
+**Checkpoint:** only `deploy-checklist.txt` remains staged; `local.env` is untracked again and its content is unchanged. Unstaging altered the index, not your file. Nothing was lost here because the staged content of `local.env` was identical to the file you still have. That would not be true for a file edited after staging (see [Unstaging and recoverability](#recovery-depends-on-where-the-mistake-is)). The internal copy Git made while the file was staged is not part of any commit; this lesson does not verify when, or whether, Git removes it.
 
 Review once more and record the legitimate change:
 
@@ -549,7 +570,7 @@ git diff
 cat ./service-notes.txt
 ```
 
-**Checkpoint:** the working tree is clean, `git diff` prints nothing, and the notes have their three recorded lines. Compare with step 6: `--staged` changed only the staging area and lost nothing; without it, the same command changed your file and lost the edit.
+**Checkpoint:** the working tree is clean, `git diff` prints nothing, and the notes have their three recorded lines. Compare with step 6: `--staged` changed only the index, and nothing was lost because the file still held the same content; without it, the same command changed your file and lost the edit.
 
 #### 11. Withdraw a recorded change with a revert
 
@@ -620,7 +641,7 @@ Keep the same shell and workspace. Continue to the [independent challenge](#prac
 
 Do not rerun setup, `git init`, or any block that creates files or commits over an existing lab. Repeating an append adds a duplicate line; repeating a commit block records a second commit.
 
-If the lab shell is still open and `git_lab_root` is set, return with `cd "$git_lab_root"` and inspect. If the shell closed, start a new one with the `env ... /bin/sh` command from [step 1](#1-start-the-lab-shell-and-check-git) and **rerun its `unset` lines and the version check block**, because the isolation settings belong to the shell, not to the lab directory. The restoration block below repeats the `unset` lines as a safeguard. Do not nest shells unnecessarily.
+If the lab shell is still open and `git_lab_root` is set, return with `cd "$git_lab_root"` and inspect. If the shell closed, start a new one with the `env ... /bin/sh` command from [step 1](#1-start-the-lab-shell-and-check-git) and **rerun its `unset` lines and the version check block**, because the isolation settings belong to the shell, not to the lab directory. The restoration block below repeats the `unset` lines, including the tracing variables, as a safeguard. Do not run any Git command in a resumed shell until you have also repeated the name check from step 1 and it prints nothing. Do not nest shells unnecessarily.
 
 Then replace the quoted placeholder with the **exact lab root you recorded**. The placeholder is deliberately unusable. If you cannot identify your lab, stop rather than guessing.
 
@@ -643,6 +664,10 @@ elif cd '/replace-with-your-recorded-path/git-change-management-lab' &&
   unset GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL GIT_COMMITTER_DATE
   unset GIT_CONFIG GIT_CONFIG_SYSTEM GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS GIT_TEMPLATE_DIR
   unset GIT_EXTERNAL_DIFF GIT_DIFF_OPTS GIT_CEILING_DIRECTORIES GIT_DISCOVERY_ACROSS_FILESYSTEM
+  unset GIT_TRACE GIT_TRACE2 GIT_TRACE2_EVENT GIT_TRACE2_PERF GIT_TRACE2_CONFIG_PARAMS GIT_TRACE2_ENV_VARS
+  unset GIT_TRACE2_BRIEF GIT_TRACE2_EVENT_BRIEF GIT_TRACE2_PERF_BRIEF GIT_TRACE2_EVENT_NESTING GIT_TRACE2_DST_DEBUG
+  unset GIT_TRACE_PACKET GIT_TRACE_PERFORMANCE GIT_TRACE_SETUP GIT_TRACE_SHALLOW GIT_TRACE_CURL GIT_TRACE_CURL_NO_DATA
+  unset GIT_TRACE_PACK_ACCESS GIT_TRACE_PACKFILE GIT_TRACE_FSMONITOR GIT_TRACE_REFS GIT_TRACE_REDACT
   printf 'Resumed lab root: %s\n' "$git_lab_root"
   printf 'Lab parent: %s\n' "$git_lab_parent"
   ls -a .
@@ -652,14 +677,15 @@ else
 fi
 ```
 
-Compare both paths with your records and confirm the entries are ones you created. Enter the repository you were working in with `cd ./guided-repo` or `cd ./challenge-repo`, then run `git rev-parse --show-toplevel`, `git status`, and `git log --oneline`. Git's own record tells you where you stopped.
+Run the name check from step 1 and confirm that it prints nothing. Then compare both paths with your records and confirm the entries are ones you created. Enter the repository you were working in with `cd ./guided-repo` or `cd ./challenge-repo`, then run `git rev-parse --show-toplevel`, `git status`, and `git log --oneline`. Git's own record tells you where you stopped.
 
 | State you observe | Safe next action |
 | --- | --- |
 | Repository directory exists but `git rev-parse --show-toplevel` fails or prints a different path | Initialization did not complete. Stop and inspect with `ls -a`. If the directory is empty, remove it by name with `rmdir` from the lab root and repeat step 3 |
 | Top level is correct but the identity is not the synthetic one | Only after `git rev-parse --show-toplevel` prints the expected repository inside your lab, run `git config --local user.name 'Lab Learner'` and `git config --local user.email 'learner@example.invalid'`, plus `git config --local core.excludesFile /dev/null` if that setting is missing. Then inspect the listing |
 | Fewer commits than a step expects | Compare the log with the list in step 12 and continue from the first missing message. Inspect files before appending; do not append a line that is already present |
-| Changes are staged but not committed | Read `git diff --staged`. Commit only if it matches the step you were on; otherwise unstage the path with `git restore --staged <path>` and redo that step's review |
+| Changes are staged but not committed | Read `git diff --staged`, and `git diff` for the same path. Commit only if the staged diff matches the step you were on. Otherwise unstage the path with `git restore --staged <path>`, but only after `git diff <path>` is empty or you have saved the staged version (see [Unstaging and recoverability](#recovery-depends-on-where-the-mistake-is)); then redo that step's review |
+| `git status` says `No commits yet` and a wrong path is staged | `git restore --staged` fails here because `HEAD` does not exist. Follow [Recovery before the first commit](#recovery-depends-on-where-the-mistake-is); if `git rm --cached` says `pathspec ... did not match any files`, the path is not staged and there is nothing to undo. Never delete `.git` to start over |
 | A tracked file has an edit you do not recognize | Inspect it with `git diff <path>`. Decide from its content whether it belongs to the current step before discarding anything |
 | `git status` reports a revert in progress | Run `git revert --abort`, confirm a clean status, and redo step 11 from its `git status` line |
 | The challenge repository already exists | Inspect its status and log. Do not rerun its setup block; continue from the first unfinished requirement |
@@ -669,7 +695,7 @@ Resuming restores the session. It does not establish that any criterion passed; 
 
 #### Cleanup after assessment
 
-Review your evidence first, and confirm that the notes you want to keep are stored outside the lab directory: this procedure permanently deletes everything inside it. Use this section after the [challenge](#practical-challenges), [questions](#questions), and [completion criteria](#completion-criteria), or to abandon an incomplete attempt.
+Review your evidence first. **Laboratory artifacts** are temporary and live inside the lab directory: the repositories, their files, and `.lab-marker`. **Your notes** are yours to keep and must live outside it, as the guided steps told you. This procedure permanently deletes everything inside the lab directory, so confirm that every note you want to keep is already outside it. Use this section after the [challenge](#practical-challenges), [questions](#questions), and [completion criteria](#completion-criteria), or to abandon an incomplete attempt.
 
 **Why this cleanup differs from the other Foundations modules.** Those modules remove each file by name and never delete recursively. That is not practical here: Git stores history as many internal files under `.git`, with names you did not choose and without write permission. This module therefore permits **one** recursive, forced removal of the entire disposable lab directory, and surrounds it with checks. The exception applies to this laboratory only. It is not a general technique: recursive removal is permanent, has no undo, and deletes everything below its target.
 
@@ -766,6 +792,14 @@ fi
 
 **Checkpoint:** `Lab directory removed.` appears only after the removal succeeded and the path no longer exists. Your current directory is the parent, which was never a removal target. Type `exit` to leave the lab shell; the isolation settings end with it and your own Git configuration was never changed. On any `STOP`, the shell stays open: run `pwd -P` and `ls -a`, and repeat the verification action rather than improvising.
 
+**If cleanup is interrupted.** Three cases, none of which allows skipping a check:
+
+- *The shell closed, or you cancelled, before the confirmation:* nothing was removed. Start the lab shell, use the [resume procedure](#resume-an-interrupted-session), and run Action 1 again.
+- *`STOP: removal is incomplete`, or the removal was interrupted while running:* part of the lab may now be gone, including `.lab-marker`, in which case verification will rightly stop. Do not recreate the marker, edit the helper, or type a removal command by hand to get past it. Open a shell in the recorded parent, run `pwd -P` and `ls -a ./git-change-management-lab`, and compare what remains with your records. Leftovers are synthetic and harmless; leaving them is acceptable.
+- *You want the leftovers gone:* ask a maintainer or mentor to review the recorded path with you. Remove them only once the target is unambiguous, and do not widen it.
+
+**When cleanup cannot be completed safely, stopping is a correct outcome.** Do not bypass or edit a safety check, do not recreate `.lab-marker` or any other file so that verification passes, and do not improvise a recursive or forced deletion (including `rm -r`, `rm -rf`, `find ... -delete`, or wildcards) outside the one verified Action 2 block. Leaving the identified laboratory remnants untouched until a maintainer or mentor can help is acceptable: they are synthetic, you have recorded where they are, and they affect nothing else. Keep the recorded path and the `ls -a` output so the person helping you can review the same facts.
+
 Removal is not secure erasure, and it does not affect backups or terminal recordings. With synthetic data that does not matter. Record the cleanup observation, then finish O5 in the [completion criteria](#completion-criteria).
 
 ## Practical Challenges
@@ -814,14 +848,14 @@ Provide these results:
 
 1. **Inspect (O2).** Before staging anything, describe the repository: which commits exist and what each changed, which files are tracked, and what each of the four pending changes is. Base every statement on a command's output, and read the *content* of each pending change, not only its name.
 2. **Record (O1).** Record the health-check fix as its own commit with a descriptive message. Show the staged review you performed immediately before committing, and justify why each other pending change was left out of that commit.
-3. **Protect (O4).** No new commit may **add** a line containing a `SYNTHETIC-NOT-A-CREDENTIAL-` marker. Decide what to do with `deploy-summary.txt` and with the unrelated draft, and justify the decision from their content. Whatever you choose, both files must still exist, unchanged, in the working directory at assessment time.
+3. **Protect (O4).** The two **supplied commits** (`Import demo service release files` and `Ignore cache settings`, created by the setup block) are the starting state, and the first one contains a synthetic marker by design. Every commit **you create** after them is a **learner commit**. No learner commit may **add** a line containing a `SYNTHETIC-NOT-A-CREDENTIAL-` marker. Decide what to do with `deploy-summary.txt` and with the unrelated draft, and justify the decision from their content. Whatever you choose, both files must still exist, unchanged, in the working directory at assessment time.
 4. **Test the claim (O4).** Gather evidence showing whether the ignore rule protects `cache-settings.conf`. Then make sure future commits will not include that file, without deleting your local copy or its pending local line, and record that as a separate commit. Finally, demonstrate whether the old fake key can still be read from the repository, and state what would have to happen if it were a real credential. A commit that stops tracking a file displays its old lines as removed; that is expected and is not a new exposure.
 5. **Recover (O3).** Carry out both situations, choosing the operation for each and explaining what it can and cannot recover:
    - Append the line `step-3=untested-idea` to `rollback-plan.txt`, then decide it was a mistake before recording it. Discard that edit so the file matches its recorded content. No other pending or local file may be affected.
    - After the fix from item 2 is recorded, a reviewer reports that the health-check path was wrong and the fix must be withdrawn **without removing anything from history**. Withdraw it. Check first that no tracked file has pending changes, and plan the order of your work accordingly. Then verify the withdrawal with evidence that does not depend on where the fix sits in the history: read `release-notes.txt` and confirm it has exactly its three imported lines; use `git log --oneline -- ./release-notes.txt` to confirm that the import, the fix, and a newer commit withdrawing the fix are all present; and inspect the withdrawing commit itself with `git show <revert-commit-id>` to confirm it removes only the fix line, in only that file. Identify that commit from the log output rather than assuming it is the most recent one: it is the line whose message begins `Revert` and quotes the message of your fix, and its ID is the short hexadecimal value at the start of that line. Replace `<revert-commit-id>`, including the angle brackets, with that value. The guided lab compared `HEAD~2` with `HEAD`. That was valid there because the reverted commit was the newest one; here another commit may sit between the fix and its withdrawal, and the same comparison would also report that commit's changes. If you want a comparison, limit it to the one file and name the commit recorded just before the fix, using its ID from `git log --oneline`: `git diff --exit-code <id-before-fix> HEAD -- ./release-notes.txt`.
 6. **Verify boundaries (O5).** Show which directory is this repository's top level, that it has no remote, and where every active configuration value comes from.
 
-**Deliverables:** your description from item 1; the staged review and message for each commit you created; the reasons for every inclusion and exclusion; the evidence for and against the colleague's claim; the demonstration that the old key remains readable, with your statement of the real-world response; before-and-after observations for both recoveries; the boundary observations; and the cleanup result. Keep your notes outside the lab directory, as in the guided lab, or explain them orally; anything stored inside the lab is deleted during cleanup. Notes need observations and reasons, not copies of the fake values. Evidence stays local.
+**Deliverables:** your description from item 1; the staged review and message for each commit you created; the reasons for every inclusion and exclusion; the evidence for and against the colleague's claim; the demonstration that the old key remains readable, with your statement of the real-world response; before-and-after observations for both recoveries; the boundary observations; and the cleanup result. Keep your notes outside the lab directory, as in the guided lab, or explain them orally; the lab's files are temporary artifacts and are deleted during cleanup, while notes you keep outside it are not. Notes need observations and reasons, not copies of the fake values. Evidence stays local.
 
 **Acceptance:** all of the following hold when you finish.
 
@@ -829,10 +863,10 @@ Provide these results:
 - `release-notes.txt` has its three imported lines; `rollback-plan.txt` has its two imported lines.
 - `cache-settings.conf` (three lines, including your colleague's local note), `deploy-summary.txt`, and `onboarding-draft.txt` still exist in the working directory with their supplied content.
 - The history keeps the two supplied commits and adds at least: the fix, the commit that stops tracking the settings file, and the withdrawal of the fix. Every commit you created has a message that describes its change.
-- No commit you created adds a marker line, and nothing was staged with a form that selects everything at once.
+- No **learner commit** (any commit after the supplied `Ignore cache settings`) adds a marker line, and nothing was staged with a form that selects everything at once. The marker inside the supplied import commit is part of the starting state and does not fail this criterion; a learner commit that **removes** that line is expected and also does not fail it. To check, find the ID of `Ignore cache settings` in `git log --oneline`, then run `git log -p <that-id>..HEAD` and confirm that no line shown with a leading `+` (other than the `+++` file headers) contains the marker text.
 - The repository has no remote and only local configuration.
 
-A working result cannot compensate for a recorded marker, a missing justification, an affected unrelated file, or a claim you did not support with evidence. Any of those means **not yet passed**: resolve it and repeat the affected checks.
+A working result cannot compensate for a marker added by a learner commit, a missing justification, an affected unrelated file, or a claim you did not support with evidence. Any of those means **not yet passed**: resolve it and repeat the affected checks.
 
 **Optional hints:** write down the state you want before running anything. A file's name describes someone's intention, not its content. Ask of each recovery: is the mistake in the working tree, in the staging area, or already recorded? `git revert` accepts any commit ID shown by `git log --oneline`, not only `HEAD`. If a command would affect more than one path, look for a narrower one.
 
@@ -864,9 +898,9 @@ Answer all ten before opening the [answer guidance](#answer-guidance). Explain t
 Compare your explanations after answering. Equivalent correct reasoning is acceptable; a command name without its effect is not.
 
 - **Q1:** The commit contains the staged version. Staging copies content at that moment. The later edit remains in the working tree as an unstaged change, visible with `git diff`.
-- **Q2:** Explicit paths make each inclusion a decision; the staged diff is the last point at which unwanted content can be stopped before it becomes durable. `git diff` compares the working tree with the staging area, so it is empty exactly when everything changed has already been staged.
+- **Q2:** Explicit paths make each inclusion a decision; the staged diff is the last point at which unwanted content can be stopped before it becomes durable. `git diff` compares the working tree with the index for tracked files only. An empty result means no tracked file has an unstaged edit. It says nothing about the next commit (that is `git diff --staged`), and it does not prove everything is staged, because untracked files do not appear in it. A safe review combines `git status` (including untracked files), `git diff` (unstaged edits), `git diff --staged` (what will be recorded), and reading the content of any untracked file you are unsure about.
 - **Q3:** `git diff --staged`; `git show HEAD` (or `git show --stat HEAD`); `git ls-files`; `git log --oneline -- <path>`.
-- **Q4:** `git restore --staged <path>` changes only the staging area and loses nothing. `git restore <path>` overwrites the working copy and the discarded edit is unrecoverable, so inspect its diff and name one path. `git revert <commit>` adds an opposite commit and loses nothing; the original remains.
+- **Q4:** `git restore --staged <path>` changes only the index: a path that exists in `HEAD` is reset to its `HEAD` version, and a path absent from `HEAD` is removed from the index and becomes untracked (before the first commit, use `git rm --cached -- <path>` instead; if it reports that the pathspec did not match, nothing was staged under that path). It loses nothing when the working file already holds the staged content; if you edited the file after staging, the earlier staged version is lost as far as you can rely on, because it is in no commit and Git's internal copy is not guaranteed to be recoverable. `git restore <path>` overwrites the working copy and the discarded edit is unrecoverable, so inspect its diff and name one path. `git revert <commit>` adds an opposite commit and loses nothing; the original remains.
 - **Q5:** A revert records a new commit rather than deleting one, which keeps history truthful and is safe for anyone who already has the original. The commit containing the secret is still present and readable, so the secret is still exposed.
 - **Q6:** `git ls-files` shows the file is tracked; `git status` still reports its modifications; `git check-ignore -v` prints nothing for it. Ignore rules apply only to untracked files, so the rule never applied. The claim confuses an ignore rule with protection of recorded content.
 - **Q7:** In every earlier commit that included it, readable with `git show <commit>:<path>` or `git log -p -- <path>`, in this repository and in every copy. A real token must be treated as exposed: report it to its owner and have it revoked or replaced through their process. Rewriting history is a separate, specialized decision that does not recall existing copies and is not made here.
@@ -885,10 +919,10 @@ Completion is **self-assessed**, or a peer may review the same evidence. It is n
 | O1 — Record | Guided steps 3–5 | Challenge item 2; Q1, Q2 | Verified repository top level, the commit list with messages, and an explanation of the three places | Each commit you created records one selected change, was staged by explicit path, and has a descriptive message; the learner correctly states where a change is at each stage |
 | O2 — Inspect | Guided steps 4–5 and 12 | Challenge item 1; Q2, Q3 | Unstaged and staged diffs before recording, log and commit inspection after, and the challenge's evidence-based description | Predictions agree with observed diffs; every statement in the description is supported by a named command's output |
 | O3 — Recover | Guided steps 6, 10, and 11 | Challenge item 5; Q4, Q5 | Before-and-after observations for an unstaging, a discarded edit, and a revert, with a statement of what each cannot recover | Only the intended path is affected each time; the reverted content equals the earlier recorded content; the original commit remains in the log; limits are stated correctly |
-| O4 — Protect | Guided steps 6–9 | Challenge items 3 and 4; Q6, Q7, Q8 | Staged review that caught the fake token; refused staging of an ignored file; tracked-file evidence against the ignore claim; old content read from history after tracking stopped; the real-exposure response | No commit the learner created adds a marker line, apart from the guided commit labeled as an intentional mistake; the learner separates ignoring, stopping tracking, and history, and names revocation by the owner as the response |
+| O4 — Protect | Guided steps 6–9 | Challenge items 3 and 4; Q6, Q7, Q8 | Staged review that caught the fake token; refused staging of an ignored file; tracked-file evidence against the ignore claim; old content read from history after tracking stopped; the real-exposure response | No commit the learner created adds a marker line. The guided commit labeled as an intentional mistake and the challenge's supplied import commit are starting states, not learner commits; the learner separates ignoring, stopping tracking, and history, and names revocation by the owner as the response |
 | O5 — Clean up | Guided steps 1–3 and 12; cleanup | Challenge item 6; cleanup review; Q9, Q10 | Git version noted, top-level and no-remote observations for both repositories, configuration origins, passed verification action, typed confirmation, and final absence observation | Both repositories are inside the lab and independent; no remote exists; only local configuration is in effect; the lab directory is absent after a verified, confirmed removal; nothing outside it was touched |
 
-**Pass:** every row and every assessment answer satisfies its criterion. Security and cleanup are mandatory; no compensating score applies. **Not yet passed:** any row lacks evidence, a marker line was added by a commit outside the labeled guided mistake, a staging form that selects everything was used, an unrelated file was changed or removed, or cleanup was run without a passed verification.
+**Pass:** every row and every assessment answer satisfies its criterion. Security and cleanup are mandatory; no compensating score applies. **Not yet passed:** any row lacks evidence, a marker line was added by a learner commit (the labeled guided mistake and the challenge's supplied commits are not learner commits), a staging form that selects everything was used, an unrelated file was changed or removed, or cleanup was run without a passed verification.
 
 **Environment-limited attempt:** if the version check stops the lab, or a checkpoint cannot be reproduced in your environment, record the actual observation and your Git version, label the affected criterion **unverified**, and clean up safely. A correct explanation is conceptual evidence, but it does not replace the practical requirement. Do not invent a passing result, and do not install, upgrade, or reconfigure software only to obtain one.
 
