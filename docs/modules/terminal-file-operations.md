@@ -8,7 +8,7 @@ You are preparing a small handoff folder for a fictional service. You need to pr
 
 Follow **Learn → Practice → Build → Validate**: read the concepts, work through the guided lab, solve a different handoff challenge, then inspect the evidence against every completion criterion. The goal is to explain and verify your actions, not memorize commands.
 
-**Verification status:** documentation and linked sources reviewed on 2026-11-12. The laboratory and challenge have **not been executed** as part of this delivery. Linux/macOS execution and cleanup verification remain pending; the outputs below are expected results, not recorded test results.
+**Verification status:** documentation and linked sources reviewed on 2026-11-12. The laboratory and challenge were later executed block by block on **Linux only**, in disposable containers (Ubuntu 24.04, `dash`, GNU utilities, one processor architecture). Of 25 planned cases, 24 passed and 1 was not applicable (it needs a deliberately injected fault); none failed. The [Linux closure report](../validation/terminal-file-operations-linux-l1-closure.md) records the evidence and its limits, and, apart from this status note, the module text is unchanged since that run. **Not yet validated:** macOS, other Linux environments and shells, the knowledge questions and self-assessment tables, and a learner's own challenge solution. The outputs below are expected results, not recorded transcripts; if your system differs, investigate before assuming a mistake.
 
 ## Why It Matters
 
@@ -379,6 +379,6 @@ For remediation, explain the failed checkpoint and choose either [resume](#resum
 
 ## Next Steps
 
-[Local Access and Synthetic Secrets](local-access-and-secrets.md) builds on scoped files and permissions. [Local Git Change Management](git-change-management.md) builds on preserving, inspecting, and recovering changes. Both are available with laboratory execution pending. Both require this competency independently; neither is a prerequisite for the other. The [Foundations learning path](../learning-paths/foundations.md) shows all three modules and a suggested order.
+[Local Access and Synthetic Secrets](local-access-and-secrets.md) builds on scoped files and permissions. [Local Git Change Management](git-change-management.md) builds on preserving, inspecting, and recovering changes. Both are available, but their validation differs: Local Access and Synthetic Secrets has Linux L1 validation with documented limitations, while Local Git Change Management has only partial validation of an earlier revision and its current revision awaits targeted revalidation. Neither has been validated on macOS; read each module's verification status before relying on its expected outputs. Both require this competency independently; neither is a prerequisite for the other. The [Foundations learning path](../learning-paths/foundations.md) shows all three modules and a suggested order.
 
 If paths still feel uncertain, draw the lab directory tree and predict reads from each child before running them. If safety checks feel mechanical, explain what each protects and what it leaves unprotected. For contributing improvements to this module, use the [curriculum authoring guide](../curriculum-authoring-guide.md).

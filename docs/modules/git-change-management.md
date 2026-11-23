@@ -10,7 +10,7 @@ Everything happens in a disposable directory on your own computer. No remote rep
 
 Follow **Learn → Practice → Build → Validate**: read the concepts, complete the guided lab in `guided-repo`, solve a different situation in `challenge-repo`, then review your evidence against every completion criterion before cleanup. The goal is to predict and verify what Git will do, not to memorize commands.
 
-**Verification status:** the resources listed below were opened and their relevant content inspected on **2026-11-13**. Commands received documentation, safety, portability, and shell-syntax review only. The laboratory and challenge have **not been executed**. Git behavior, Linux/macOS compatibility, interruption recovery, and cleanup remain pending practical validation; no Git version has been practically tested with this lesson. Checkpoints describe expected results, not recorded results. A shell syntax check does not establish that a Git command behaves as described. The corrections made after an independent review (staging recoverability, untracked files, challenge criteria, unborn `HEAD`, tracing variables, interrupted cleanup) have likewise not been executed.
+**Verification status:** the resources listed below were opened and their relevant content inspected on **2026-11-13**. **Validation is partial.** An earlier version of this module was executed on **Linux only**, in a disposable container (Ubuntu 24.04, Git 2.43.0, `dash`). The [execution plan](../validation/git-change-management-linux-l1-execution-plan.md), last revised on 2026-11-17, describes that partial run and the cases still pending; its authoritative results record is kept outside this repository, so exact case counts are not repeated here. The module was **revised afterwards** (corrected Git safety guidance and recovery instructions, 2026-11-23), so those earlier results do not automatically cover the current text, and targeted revalidation is still pending. **Not yet validated:** the current text as a whole, the challenge and cleanup procedures, macOS, other Linux environments and Git versions, and the knowledge questions. Checkpoints describe expected results, not recorded transcripts. A shell syntax check does not establish that a Git command behaves as described.
 
 ## Why It Matters
 
@@ -44,7 +44,7 @@ Run blocks in order and inspect each checkpoint. Do not paste the whole module a
 | --- | --- | --- |
 | Minimum supported | Git 2.32.0 | Determined from the features this lab requires, checked against official Git documentation |
 | Recommended | The current stable release provided by your operating system vendor or the Git project | Git has no long-term-support channel; the Git project listed 2.56.1 (2026-10-26) as its latest release when reviewed |
-| Practically tested | None yet | The laboratory has not been executed; tested versions will be recorded when it is |
+| Practically tested | Git 2.43.0, Linux L1 only, earlier revision | A previous revision of the laboratory was executed with this version. The current revision awaits targeted revalidation, and no other Git version or macOS run has been tested |
 
 | Required feature | First available | Documentation inspected |
 | --- | --- | --- |

@@ -4,7 +4,7 @@ This page is the starting point for the Foundations level of the DevOps Engineer
 
 **Track:** `foundations` · **Level:** Foundations · **Modules:** 3
 
-**Verification status:** the modules have received documentation, safety, and automated reference review. Their laboratories and challenges have **not yet been executed** as part of the project's own validation. Each module states its verification status in its Overview; read it before you rely on an expected output.
+**Verification status:** the modules have received documentation, safety, and automated reference review. Validation on real systems is partial and covers **Linux only**; nothing has been validated on macOS. **Safe Terminal File Operations:** Linux L1 validation is complete, with documented limitations ([closure report](../validation/terminal-file-operations-linux-l1-closure.md)). **Local Access and Synthetic Secrets:** Linux L1 validation is complete for the executed scope, with one case (`LAS-P01`, behavior as root) still planned ([closure report](../validation/local-access-and-secrets-linux-l1-closure.md)). **Local Git Change Management:** an earlier revision has partial Linux L1 validation; the current revision was edited afterwards and needs targeted revalidation ([execution plan](../validation/git-change-management-linux-l1-execution-plan.md)). Do not treat the curriculum as fully validated. Each module states its verification status in its Overview; read it before you rely on an expected output.
 
 ## Who this path is for
 
