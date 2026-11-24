@@ -68,7 +68,7 @@ Take them in this order. Time needed varies by learner, so no estimates are give
 | --- | --- | --- | --- | --- |
 | 1 | [Safe Terminal File Operations](docs/modules/terminal-file-operations.md) | Available | Labs run on Linux with no failures. Not yet run on macOS. | English; [Portuguese draft](docs/locales/pt-BR/modules/terminal-file-operations.md) |
 | 2 | [Local Access and Synthetic Secrets](docs/modules/local-access-and-secrets.md) | Available | Labs run on Linux with no failures; one extra check (running as an administrator) is still pending. Not yet run on macOS. | English; [Portuguese draft](docs/locales/pt-BR/modules/local-access-and-secrets.md) |
-| 3 | [Local Git Change Management](docs/modules/git-change-management.md) | Available, with partial checking | Part of an earlier version was run on Linux, and a later check of the changed parts passed. Much of the module, including most of the challenge and the cleanup, has not been run. Not yet run on macOS. | English; [Portuguese draft](docs/locales/pt-BR/modules/git-change-management.md) |
+| 3 | [Local Git Change Management](docs/modules/git-change-management.md) | Available, with partial checking | Part of an earlier version was run on Linux, and later checks of the changed parts and of the cleanup procedure passed (in rebuilt labs, not after the full challenge). Much of the module, including most of the challenge, has not been run. Not yet run on macOS. | English; [Portuguese draft](docs/locales/pt-BR/modules/git-change-management.md) |
 
 Module 1 comes first. Modules 2 and 3 each need module 1, but not each other.
 
