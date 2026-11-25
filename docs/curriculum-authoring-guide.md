@@ -14,11 +14,11 @@ The initial approved Foundations competencies are:
 
 | Stable ID | Required competency IDs | Content status |
 | --- | --- | --- |
-| `terminal-file-operations` | None | [Module available](modules/terminal-file-operations.md); laboratory execution pending |
-| `local-access-and-secrets` | `terminal-file-operations` | [Module available](modules/local-access-and-secrets.md); laboratory execution pending |
-| `git-change-management` | `terminal-file-operations` | [Module available](modules/git-change-management.md); laboratory execution pending |
+| `terminal-file-operations` | None | [Module available](modules/terminal-file-operations.md); see its verification status |
+| `local-access-and-secrets` | `terminal-file-operations` | [Module available](modules/local-access-and-secrets.md); see its verification status |
+| `git-change-management` | `terminal-file-operations` | [Module available](modules/git-change-management.md); see its verification status |
 
-This list records scope and prerequisite intent; it is not a second machine-readable track definition. The [Foundations learning path](learning-paths/foundations.md) is the learner-facing entry point for these modules, and [the Foundations track record](../curriculum/tracks/foundations.json) holds the machine-readable membership. Do not create placeholder links to unpublished modules or expand the curriculum while fixing an existing lesson.
+Validation differs by module: some laboratory execution has been recorded, but it is partial, and each module's own verification status says what has and has not been checked. This list records scope and prerequisite intent; it is not a second machine-readable track definition. The [Foundations learning path](learning-paths/foundations.md) is the learner-facing entry point for these modules, and [the Foundations track record](../curriculum/tracks/foundations.json) holds the machine-readable membership. Do not create placeholder links to unpublished modules or expand the curriculum while fixing an existing lesson.
 
 ## Use a consistent module structure
 

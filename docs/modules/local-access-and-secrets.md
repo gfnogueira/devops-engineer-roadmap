@@ -244,7 +244,7 @@ If a report contains unintended content, keep it private, inspect it, remove onl
 
 #### 6. Review before removal
 
-Keep the same shell and workspace for the [independent challenge](#practical-challenges). Answer the [questions](#questions), compare the [answer guidance](#answer-guidance), and review [completion criteria](#completion-criteria) while artifacts still exist. Then perform [cleanup](#cleanup-after-assessment). Any private notes must stay inside the lab and contain observations rather than secret values. You may instead clean up an incomplete attempt; that does not establish completion.
+Keep the same shell and workspace for the [independent challenge](#practical-challenges). Answer the [questions](#questions), compare the [answer guidance](#answer-guidance), and review [completion criteria](#completion-criteria) while artifacts still exist. Then perform [cleanup](#cleanup-after-assessment). Keep your personal notes outside the lab so they survive cleanup, and have them contain observations rather than secret values. Files the exercise creates stay in the lab. You may instead clean up an incomplete attempt; that does not establish completion.
 
 #### Resume an interrupted session
 
@@ -416,4 +416,4 @@ Review O1–O4 while artifacts exist, perform [challenge cleanup](#challenge-cle
 
 If path diagnosis or cleanup is uncertain, revisit [Safe Terminal File Operations](terminal-file-operations.md). The [Foundations learning path](../learning-paths/foundations.md) shows where this module sits among the current modules. To improve this module, use the [curriculum authoring guide](../curriculum-authoring-guide.md).
 
-[Local Git Change Management](git-change-management.md) is available. An earlier revision of it has partial Linux L1 validation, and its current revision awaits targeted revalidation; see its verification status. It shares `terminal-file-operations` as its required prerequisite; this module is not an additional required dependency. The Git module addresses staging and history, while this module establishes local access and disclosure decisions. Separate service identities, ACL administration, secret managers, and real incident handling require further learning and are outside this Foundations exercise.
+[Local Git Change Management](git-change-management.md) is available. It is only partly validated; see its verification status for what has and has not been checked. It shares `terminal-file-operations` as its required prerequisite; this module is not an additional required dependency. The Git module addresses staging and history, while this module establishes local access and disclosure decisions. Separate service identities, ACL administration, secret managers, and real incident handling require further learning and are outside this Foundations exercise.

@@ -69,7 +69,11 @@ Cada módulo explica o que fazer se você for interrompido, fechar o terminal ou
 
 ## Onde guardar suas anotações
 
-O módulo pede que você registre algumas informações, como o caminho da sua pasta de prática. Guarde as anotações em um lugar comum **fora da pasta de prática**, porque a limpeza apaga essa pasta. Um arquivo de texto simples na sua pasta de documentos funciona bem. Não escreva nele senhas, chaves ou informações pessoais reais.
+O módulo pede que você registre algumas informações, como o caminho da sua pasta de prática. Guarde as suas anotações de aprendizagem em um lugar comum **fora da pasta de prática**, porque a limpeza apaga essa pasta. Um editor de texto ou uma folha de papel funcionam bem, e as anotações sobrevivem à limpeza.
+
+- **Os arquivos dos exercícios ficam na pasta de prática.** Arquivos que um exercício pede para criar ou alterar devem permanecer onde o módulo os coloca. Não os mova para fora só para guardá-los.
+- **Nunca copie informações sensíveis para as anotações.** Não escreva senhas, tokens, chaves ou informações pessoais reais, nem cole saídas sensíveis do terminal. Os exemplos falsos dos módulos são identificados como sintéticos.
+- **Você pode guardar um resumo curto e seguro** do que observou, fora do laboratório, como registro pessoal do seu progresso.
 
 ## Como saber que você terminou
 
@@ -91,6 +95,7 @@ Antes de confiar nas saídas esperadas de um módulo, leia a **Situação da ver
 | --- | --- |
 | Terminal | A janela em que você digita comandos e lê as respostas. |
 | Shell | O programa dentro do terminal que lê os seus comandos e os executa. |
+| Shell filho | Um shell separado iniciado dentro do atual, na mesma janela de terminal. O prompt pode ficar diferente e variáveis definidas nele podem não existir fora. Digite `exit` para voltar. Alguns laboratórios iniciam um de propósito. |
 | Prompt | O texto que o shell mostra quando está pronto para um comando, muitas vezes terminando em `$` ou `%`. |
 | Comando | Uma instrução que você digita, como `pwd`. |
 | Argumento | Informação extra passada a um comando, como o nome de um arquivo. |

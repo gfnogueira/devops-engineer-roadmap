@@ -67,7 +67,11 @@ Every module explains what to do if you are interrupted, close the terminal, or 
 
 ## Where to keep your notes
 
-The module asks you to record a few things, such as the path of your practice folder. Keep your notes in a normal place **outside the practice folder**, because cleanup deletes that folder. A plain text file in your documents folder works well. Do not write real passwords, keys, or personal information in it.
+The module asks you to record a few things, such as the path of your practice folder. Keep your own learning notes in a normal place **outside the practice folder**, because cleanup deletes that folder. A text editor or a sheet of paper works well, and your notes will survive cleanup.
+
+- **Exercise files stay in the practice folder.** Files an exercise asks you to create or change must remain where the module puts them. Do not move them out just to keep them.
+- **Never copy sensitive information into your notes.** Do not write real passwords, tokens, keys, or personal information, or paste sensitive terminal output. Fake examples in the modules are labelled as synthetic.
+- **You may keep a short, safe summary** of what you observed, outside the lab, as your own record of progress.
 
 ## How to know you are done
 
@@ -100,5 +104,6 @@ Before you rely on a module's expected outputs, read the **Verification status**
 | Secret | Information that must stay private, such as a password or key. The exercises use fake ones. |
 | Git | A tool that records the history of changes to files. |
 | Repository | A folder whose changes Git records. |
+| Child shell | A separate shell started inside your current one, in the same terminal window. Its prompt may look different, and variables set inside it may not exist outside. Type `exit` to return. Some labs start one on purpose. |
 | Checkpoint | A description of what you should see before moving on. |
 | Disposable | Safe to delete. Practice folders are disposable. |

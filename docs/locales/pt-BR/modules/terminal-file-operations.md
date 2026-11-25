@@ -120,6 +120,8 @@ A partir do diretório pai pessoal escolhido nos Pré-requisitos, inicie o shell
 env ENV= HISTFILE= /bin/sh
 ```
 
+**O que este comando faz:** ele inicia uma sessão de shell separada dentro da mesma janela de terminal. O prompt pode ficar diferente depois, por exemplo apenas `$`; isso é esperado. Variáveis definidas dentro deste shell podem não existir no shell original, e vice-versa. Digitar `exit` encerra este shell e devolve você ao anterior. Não digite `exit` antes da hora: os passos seguintes dependem desta sessão ativa, e sair significa ter de [retomar](#retomar-uma-sessão-interrompida) o seu laboratório.
+
 Execute o bloco a seguir **nesse novo shell**. Um shell filho é um interpretador de comandos separado; suas configurações e variáveis não alteram as do shell que o iniciou. `if ... then ... else ... fi` escolhe um ramo de sucesso ou de falha. `unset` apaga um valor antigo para que uma configuração que falhe não reutilize o caminho de um laboratório anterior. Sem `-p`, `mkdir` recusa um nome que já existe. A cadeia `&&` só registra uma localização depois de criar e entrar no novo diretório com sucesso.
 
 ```sh
@@ -262,7 +264,7 @@ Escolha um ponto de verificação para retomar e registre o que já estava prese
 
 #### Limpeza após a avaliação
 
-Use esta seção depois do [desafio](#desafios-práticos), das [perguntas](#perguntas) e da [revisão das evidências](#critérios-de-conclusão), ou para interromper com segurança uma tentativa incompleta. Termine de inspecionar as evidências antes de remover. Mantenha evidências pessoais em privado; não envie transcrições do terminal com nomes de usuário ou caminhos absolutos pessoais. Você pode escrever um breve relatório de observações, com dados sensíveis omitidos, dentro do laboratório e revisá-lo antes de apagá-lo.
+Use esta seção depois do [desafio](#desafios-práticos), das [perguntas](#perguntas) e da [revisão das evidências](#critérios-de-conclusão), ou para interromper com segurança uma tentativa incompleta. Termine de inspecionar as evidências antes de remover. Mantenha evidências pessoais em privado; não envie transcrições do terminal com nomes de usuário ou caminhos absolutos pessoais. Antes de apagar o laboratório, você pode escrever um breve resumo das suas observações, com dados sensíveis omitidos, nas suas anotações pessoais, que ficam fora do laboratório. Não mova arquivos do laboratório para fora dele para guardá-los e não copie credenciais nem saídas sensíveis do terminal para as suas anotações.
 
 Primeiro, volte ao espaço de trabalho conhecido e inspecione-o. `test -n` exige um caminho registrado não vazio, porque um shell pode tratar `cd ""` como sucesso sem mudar de diretório. `&&` interrompe a sequência quando qualquer verificação falha, e a comparação confirma que sua localização física é igual ao caminho registrado antes de qualquer listagem. Se o diretório exibido não for o seu laboratório, ou se aparecer uma linha `STOP`, **pare**.
 
@@ -323,7 +325,7 @@ Produza este estado usando sua própria sequência de comandos:
 4. Um colega relata que a origem escolhida parece desaparecer depois de entrar em `./challenge/output`. Reproduza uma leitura segura de arquivo ausente com um caminho relativo de sua escolha e, então, diagnostique o erro usando observações de localização e de diretórios. Registre o comando que falhou e o status; demonstre leituras corretas com caminho relativo e absoluto sem recriar nem mover a origem. Nenhum comando que falha é fornecido: explique o caminho que você escolheu e por que ele falhou.
 5. Mostre que as permissões de criação são restritas, que os nomes de arquivo com espaços permanecem intactos e que uma sobrescrita comum com `>` da origem escolhida é rejeitada. Compare-a novamente com o backup depois disso e inspecione a outra origem em relação ao texto original especificado.
 
-**Entregáveis:** os quatro arquivos inspecionados (dois originais, um backup, uma entrega), o motivo de ter selecionado a lista de verificação pendente, um relato conciso das suas operações, as observações de comparação/status, a leitura que falhou e os caminhos corrigidos, a evidência da proteção contra sobrescrita e o resultado da limpeza. Associe-os a O1–O5. Guarde quaisquer anotações escritas dentro do laboratório; omita prefixos de caminhos pessoais se for discutir com outra pessoa.
+**Entregáveis:** os quatro arquivos inspecionados (dois originais, um backup, uma entrega), o motivo de ter selecionado a lista de verificação pendente, um relato conciso das suas operações, as observações de comparação/status, a leitura que falhou e os caminhos corrigidos, a evidência da proteção contra sobrescrita e o resultado da limpeza. Associe-os a O1–O5. Mantenha os arquivos do exercício no laboratório e guarde suas anotações pessoais fora dele, para que sobrevivam à limpeza. Não coloque credenciais nem saídas sensíveis do terminal nas anotações e omita prefixos de caminhos pessoais se for discutir com outra pessoa.
 
 **Aceitação:** as cinco condições acima são atendidas, a escolha da entrada é justificada pelo conteúdo, as duas falhas esperadas são explicadas, os dois originais permanecem inalterados e a limpeza é bem-sucedida sem tocar em arquivos que não pertencem ao laboratório. Uma diferença inesperada, evidência ausente, falha sem explicação ou escrita fora do escopo significa **ainda não aprovado**. Resolva o problema e repita as verificações afetadas.
 
@@ -339,7 +341,7 @@ Depois da revisão das evidências, volte à raiz do laboratório e inspecione `
 
 ### Perguntas
 
-Responda às seis perguntas antes de passar para as [orientações de resposta](#orientações-de-resposta). Cada resposta deve explicar o mecanismo e a próxima ação segura, não apenas citar um comando. Mantenha qualquer resposta escrita dentro do laboratório até revisá-la.
+Responda às seis perguntas antes de passar para as [orientações de resposta](#orientações-de-resposta). Cada resposta deve explicar o mecanismo e a próxima ação segura, não apenas citar um comando. Escreva suas respostas nas suas anotações pessoais fora do laboratório (editor de texto ou papel), para que sobrevivam à limpeza. Não copie credenciais nem saídas sensíveis do terminal para elas.
 
 1. **Q1 — O1/O3:** Por que `./inbox/service notes.txt` funciona na raiz do laboratório, mas falha dentro de `work`? Como você pode provar que o arquivo ainda existe?
 2. **Q2 — O2:** Que evidência distingue copiar, renomear e acrescentar neste exercício?
@@ -381,6 +383,6 @@ Para remediar, explique o ponto de verificação que falhou e escolha entre [ret
 
 ## Próximos passos
 
-[Acesso Local e Segredos de Teste](local-access-and-secrets.md) baseia-se em arquivos com escopo definido e em permissões. [Gerenciamento de Mudanças Locais com Git](git-change-management.md) baseia-se em preservar, inspecionar e recuperar mudanças. Ambos estão disponíveis, mas a validação deles difere: o Acesso Local e Segredos de Teste tem validação Linux L1 com limitações documentadas, enquanto o Gerenciamento de Mudanças Locais com Git tem apenas validação parcial de uma revisão anterior, e sua revisão atual aguarda revalidação direcionada. Nenhum foi validado em macOS; leia a situação da verificação de cada módulo antes de confiar nas saídas esperadas. Os dois exigem esta competência de forma independente; nenhum é pré-requisito do outro. A [trilha de aprendizagem de Fundamentos](../../../learning-paths/foundations.md) (em inglês) mostra os três módulos e uma ordem sugerida.
+[Acesso Local e Segredos de Teste](local-access-and-secrets.md) baseia-se em arquivos com escopo definido e em permissões. [Gerenciamento de Mudanças Locais com Git](git-change-management.md) baseia-se em preservar, inspecionar e recuperar mudanças. Ambos estão disponíveis, mas a validação deles difere: o Acesso Local e Segredos de Teste tem validação Linux L1 com limitações documentadas, enquanto o Gerenciamento de Mudanças Locais com Git está apenas parcialmente validado. Nenhum foi validado em macOS; leia a situação da verificação de cada módulo, que diz o que foi e o que não foi verificado, antes de confiar nas saídas esperadas. Os dois exigem esta competência de forma independente; nenhum é pré-requisito do outro. A [trilha de aprendizagem de Fundamentos](../../../learning-paths/foundations.md) (em inglês) mostra os três módulos e uma ordem sugerida.
 
 Se os caminhos ainda parecerem incertos, desenhe a árvore de diretórios do laboratório e preveja as leituras a partir de cada diretório filho antes de executá-las. Se as verificações de segurança parecerem mecânicas, explique o que cada uma protege e o que deixa desprotegido. Para contribuir com melhorias neste módulo, use o [guia de autoria do currículo](../../../curriculum-authoring-guide.md) (em inglês).

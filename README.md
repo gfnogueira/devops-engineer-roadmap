@@ -2,6 +2,14 @@
 
 A free, step-by-step curriculum for learning the practical skills behind DevOps work. Each module teaches a skill, lets you practice it safely on your own computer, asks you to apply it to a new problem, and shows you how to check your own evidence.
 
+> **Public beta.** Welcome! This project is in public beta, so it is still growing and may contain mistakes.
+>
+> - **Available now:** the **Foundations** learning path, with **three instructional modules**. The rest of the curriculum is incomplete and will evolve.
+> - **Where it has been checked:** Linux is the main environment where the material has been technically validated, and even there not every step has been tested. macOS has not received equivalent validation. Native Windows and WSL are not validated or supported in this beta.
+> - **How to work safely:** follow each checkpoint, and stop when a step says **STOP** or when your output does not match what is described.
+> - **No certification:** taking part in the beta, or finishing a module, does not grant a certification.
+> - **Feedback is welcome:** see [How to give feedback](#how-to-give-feedback).
+
 > **New here? Start with the guide:**
 >
 > - **English:** [Start Here](docs/start-here.md)
@@ -48,9 +56,9 @@ All exercises use fictional data. Nothing needs real credentials.
 
 | System | Status |
 | --- | --- |
-| Linux | Written for it. The labs have been run on one Linux setup (Ubuntu 24.04, in a container); see the table below for limits. |
+| Linux | Written for it, and the main environment for technical validation. Parts of the labs have been run on one Linux setup (Ubuntu 24.04, in a container); see the table below for limits. |
 | macOS | Written for it, but **not yet tested**. Small differences in output are possible. |
-| Windows | Not covered. |
+| Windows (native) and WSL | **Not validated or supported** in this beta. |
 
 ## How to start
 
@@ -68,7 +76,7 @@ Take them in this order. Time needed varies by learner, so no estimates are give
 | --- | --- | --- | --- | --- |
 | 1 | [Safe Terminal File Operations](docs/modules/terminal-file-operations.md) | Available | Labs run on Linux with no failures. Not yet run on macOS. | English; [Portuguese draft](docs/locales/pt-BR/modules/terminal-file-operations.md) |
 | 2 | [Local Access and Synthetic Secrets](docs/modules/local-access-and-secrets.md) | Available | Labs run on Linux with no failures; one extra check (running as an administrator) is still pending. Not yet run on macOS. | English; [Portuguese draft](docs/locales/pt-BR/modules/local-access-and-secrets.md) |
-| 3 | [Local Git Change Management](docs/modules/git-change-management.md) | Available, with partial checking | Part of an earlier version was run on Linux. Later checks of the changed parts, the cleanup procedure and the challenge (run with a reference solution, not by a learner) passed. Most of the guided lab, as currently written, has not been re-run. Not yet run on macOS. | English; [Portuguese draft](docs/locales/pt-BR/modules/git-change-management.md) |
+| 3 | [Local Git Change Management](docs/modules/git-change-management.md) | Available, partly checked | Parts of the module have been run on Linux, including the cleanup procedure and the challenge (run with a reference solution, not by a learner). Most of the guided lab as now written has not been re-run. Not yet run on macOS. Read the module's verification status first; details are in the [validation note](docs/validation/git-change-management-validation-status.md). | English; [Portuguese draft](docs/locales/pt-BR/modules/git-change-management.md) |
 
 Module 1 comes first. Modules 2 and 3 each need module 1, but not each other.
 
@@ -77,6 +85,13 @@ Module 1 comes first. Modules 2 and 3 each need module 1, but not each other.
 - **"Run on Linux"** means the commands were executed in a disposable test environment and behaved as the module describes. It does not mean they were tested on every system.
 - **Each module begins with a "Verification status" note** that states exactly what was and was not checked. Read it before you rely on an expected output.
 - **English is the official text.** The Portuguese versions are drafts made with machine assistance and are **waiting for human review**; if they differ from the English, follow the English.
+
+## How to give feedback
+
+Use [GitHub Issues](https://github.com/gfnogueira/devops-engineer-roadmap/issues) to report a problem, a confusing explanation, or an idea. Choose one of three templates: **Bug report**, **Learning difficulty**, or **Improvement suggestion**.
+
+- GitHub Issues is an **asynchronous, public** feedback channel. It is **not real-time technical support**, and replies may take time.
+- **Everything you post is public.** Never share credentials, access tokens, private keys, secrets, or personal information. Do not paste sensitive terminal output or whole terminal sessions. Remove private paths, usernames, hostnames, and anything that identifies you before sharing a few relevant lines.
 
 ## Contributing and project status
 

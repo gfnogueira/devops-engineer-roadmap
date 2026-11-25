@@ -118,6 +118,8 @@ From the personal parent directory selected in Prerequisites, start the lab shel
 env ENV= HISTFILE= /bin/sh
 ```
 
+**What this command does:** it starts a separate shell session inside the same terminal window. Your prompt may look different afterwards, for example just `$`; that is expected. Variables you define inside this shell may not exist in your original shell, and the reverse. Typing `exit` ends this shell and returns you to the previous one. Do not type `exit` early: the following steps depend on this active session, and leaving it means you would have to [resume](#resume-an-interrupted-session) your lab.
+
 Run the following block **in that new shell**. A child shell is a separate command interpreter; its settings and variables do not change those of the shell that launched it. `if ... then ... else ... fi` chooses a success or failure branch. `unset` clears an old value so a failed setup cannot reuse a previous lab path. Without `-p`, `mkdir` refuses an already existing name. The `&&` chain records a location only after creating and entering the new directory successfully.
 
 ```sh
@@ -260,7 +262,7 @@ Choose one checkpoint to resume and record what was already present. This route 
 
 #### Cleanup after assessment
 
-Use this section after the [challenge](#practical-challenges), [questions](#questions), and [evidence review](#completion-criteria), or to stop an incomplete attempt safely. Finish inspecting evidence before removal. Keep personal evidence private; do not upload terminal transcripts with usernames or absolute personal paths. You can write a short redacted observation report in the lab and review it before deleting it.
+Use this section after the [challenge](#practical-challenges), [questions](#questions), and [evidence review](#completion-criteria), or to stop an incomplete attempt safely. Finish inspecting evidence before removal. Keep personal evidence private; do not upload terminal transcripts with usernames or absolute personal paths. Before you delete the lab, you may write a short, redacted summary of your observations in your personal notes, which live outside the lab. Do not move lab files out of the lab to keep them, and do not copy credentials or sensitive terminal output into your notes.
 
 First return to the known workspace and inspect it. `test -n` requires a nonempty recorded path, because a shell may treat `cd ""` as success without changing directory. `&&` stops the sequence when any check fails, and the comparison confirms that your physical location equals the recorded path before anything is listed. If the displayed directory is not your lab, or a `STOP` line appears, **stop**.
 
@@ -321,7 +323,7 @@ Produce this state using your own command sequence:
 4. A colleague reports that the selected source appears to disappear after entering `./challenge/output`. Reproduce a safe missing-file read with a relative path you choose, then diagnose the error using location and directory observations. Record the failed command and status; demonstrate corrected relative and absolute reads without recreating or relocating the source. No failing command is supplied: explain the path you chose and why it failed.
 5. Show that creation permissions are restricted, spaced filenames remain intact, and an ordinary `>` overwrite of the selected source is rejected. Recompare it with its backup afterward, and inspect the other source against its specified original text.
 
-**Deliverables:** the four inspected files (two originals, one backup, one handoff), the reason for selecting the pending checklist, a concise account of your operations, comparison/status observations, the failed read and corrected paths, overwrite-protection evidence, and the cleanup result. Associate them with O1–O5. Store any written notes inside the lab; redact personal path prefixes if discussing them with someone else.
+**Deliverables:** the four inspected files (two originals, one backup, one handoff), the reason for selecting the pending checklist, a concise account of your operations, comparison/status observations, the failed read and corrected paths, overwrite-protection evidence, and the cleanup result. Associate them with O1–O5. Keep exercise files in the lab, and keep your personal notes outside it so they survive cleanup. Do not put credentials or sensitive terminal output in your notes, and redact personal path prefixes if discussing them with someone else.
 
 **Acceptance:** all five conditions above hold, the input choice is justified by its contents, both expected failures are explained, both originals stay unchanged, and cleanup succeeds without touching unrelated files. An unexpected difference, missing evidence, unexplained failure, or out-of-scope write means **not yet passed**. Resolve the issue and repeat the affected checks.
 
@@ -337,7 +339,7 @@ After evidence review, return to the lab root and inspect `./challenge/source`, 
 
 ### Questions
 
-Answer all six questions before moving to the [answer guidance](#answer-guidance). Each answer must explain the mechanism and the safe next action, not just name a command. Keep any written answers inside the lab until you have reviewed them.
+Answer all six questions before moving to the [answer guidance](#answer-guidance). Each answer must explain the mechanism and the safe next action, not just name a command. Write any answers in your personal notes outside the lab (a text editor or paper), so they survive cleanup. Do not copy credentials or sensitive terminal output into them.
 
 1. **Q1 — O1/O3:** Why does `./inbox/service notes.txt` work at the lab root but fail inside `work`? How can you prove the file still exists?
 2. **Q2 — O2:** What evidence distinguishes copying, renaming, and appending in this exercise?
@@ -379,6 +381,6 @@ For remediation, explain the failed checkpoint and choose either [resume](#resum
 
 ## Next Steps
 
-[Local Access and Synthetic Secrets](local-access-and-secrets.md) builds on scoped files and permissions. [Local Git Change Management](git-change-management.md) builds on preserving, inspecting, and recovering changes. Both are available, but their validation differs: Local Access and Synthetic Secrets has Linux L1 validation with documented limitations, while Local Git Change Management has only partial validation of an earlier revision and its current revision awaits targeted revalidation. Neither has been validated on macOS; read each module's verification status before relying on its expected outputs. Both require this competency independently; neither is a prerequisite for the other. The [Foundations learning path](../learning-paths/foundations.md) shows all three modules and a suggested order.
+[Local Access and Synthetic Secrets](local-access-and-secrets.md) builds on scoped files and permissions. [Local Git Change Management](git-change-management.md) builds on preserving, inspecting, and recovering changes. Both are available, but their validation differs: Local Access and Synthetic Secrets has Linux L1 validation with documented limitations, while Local Git Change Management is only partly validated. Neither has been validated on macOS; read each module's verification status for what has and has not been checked before relying on its expected outputs. Both require this competency independently; neither is a prerequisite for the other. The [Foundations learning path](../learning-paths/foundations.md) shows all three modules and a suggested order.
 
 If paths still feel uncertain, draw the lab directory tree and predict reads from each child before running them. If safety checks feel mechanical, explain what each protects and what it leaves unprotected. For contributing improvements to this module, use the [curriculum authoring guide](../curriculum-authoring-guide.md).
