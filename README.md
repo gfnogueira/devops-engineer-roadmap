@@ -95,4 +95,31 @@ Use [GitHub Issues](https://github.com/gfnogueira/devops-engineer-roadmap/issues
 
 ## Contributing and project status
 
-This project is under active development. A license has not been selected yet, so no reuse terms are offered at this time. For how modules are written and checked, see the [curriculum authoring guide](docs/curriculum-authoring-guide.md).
+This project is under active development. Community contributions are welcome through GitHub Pull Requests; see [CONTRIBUTING.md](CONTRIBUTING.md). For how modules are written and checked, see the [curriculum authoring guide](docs/curriculum-authoring-guide.md).
+
+## Creator and maintainer
+
+DevOps Engineer Roadmap was created by Guilherme Nogueira ([gfnogueira](https://github.com/gfnogueira)), who is the principal maintainer. This repository, [gfnogueira/devops-engineer-roadmap](https://github.com/gfnogueira/devops-engineer-roadmap), is the canonical upstream project.
+
+## License
+
+This project uses two licenses, depending on the kind of material.
+
+| Material | License |
+| --- | --- |
+| Original educational documentation: `README.md`, `CONTRIBUTING.md`, and Markdown under `docs/` (modules, learning paths, guides, validation notes, ADRs, translated drafts) | [CC BY-SA 4.0](LICENSE-docs) |
+| Software and tooling: `scripts/`, `tests/`, `package.json`, `tsconfig.json`, Dockerfiles, `.agents/`, `.github/` | [MIT](LICENSE) |
+| Machine-readable curriculum data and schemas: `curriculum/` (manifest, tracks, competencies, JSON schemas) | [MIT](LICENSE) |
+| Original code examples and shell snippets embedded in the educational Markdown | [MIT](LICENSE) |
+
+**Embedded code examples.** Original code and shell snippets inside lessons and labs are MIT-licensed, so you can reuse them in your own projects without applying CC BY-SA to those projects. The surrounding explanatory text remains CC BY-SA 4.0.
+
+**Curriculum data.** The structure, identifiers, prerequisites, and schemas under `curriculum/` are MIT. The `pt-BR` localization overlays under `curriculum/locales/` are translations of CC BY-SA educational text, so they are licensed under CC BY-SA 4.0.
+
+**Translations.** Translated documentation, including the `pt-BR` drafts, is an adaptation of the English text and is licensed under CC BY-SA 4.0.
+
+**Third-party material.** Links to and short references of external sources (for example official documentation) stay under their own licenses and are not relicensed by this project. Only original project material is covered above.
+
+**Attribution.** When you reuse or adapt CC BY-SA material, credit "DevOps Engineer Roadmap by Guilherme Nogueira (gfnogueira)", link to this repository and to the license, and indicate whether you made changes. When you reuse MIT material, keep the copyright and license notice from [LICENSE](LICENSE). You do not need to ask for permission.
+
+**Forks and adaptations** are allowed under the terms of the applicable license, and they do not need to be hosted in this repository. Contributions are accepted under these same licenses; see [CONTRIBUTING.md](CONTRIBUTING.md). Copyright in contributions stays with their authors.
